@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"Lifeform",
   "parent":{
-    "name":"Lifeforms",
-    "path":"folders/Scripts/Lifeforms.yy",
+    "name":"Lifeform",
+    "path":"folders/Scripts/Lifeform.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

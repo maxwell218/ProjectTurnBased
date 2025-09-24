@@ -1,7 +1,11 @@
 {
   "$GMObject":"",
   "%Name":"obj_hex_tile",
-  "eventList":[],
+  "eventList":[
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":64,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+  ],
   "managed":true,
   "name":"obj_hex_tile",
   "overriddenProperties":[],
@@ -28,8 +32,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_tile_base",
-    "path":"sprites/spr_tile_base/spr_tile_base.yy",
+    "name":"spr_hex_tile",
+    "path":"sprites/spr_hex_tile/spr_hex_tile.yy",
   },
   "spriteMaskId":null,
   "visible":true,

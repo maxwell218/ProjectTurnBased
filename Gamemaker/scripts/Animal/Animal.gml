@@ -1,3 +1,0 @@
-function Animal() : Lifeform() constructor {
-
-}
