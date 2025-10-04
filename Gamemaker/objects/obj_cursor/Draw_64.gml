@@ -13,7 +13,9 @@ if (global.debug) {
 
 	draw_text(_x, _y, "Cursor x: " + string(x));
 	draw_text(_x, _y + 16, "Cursor y: " + string(y));
+	draw_text(_x, _y + 32, "Gui x: " + string(gui_y));
+	draw_text(_x, _y + 48, "Gui y: " + string(gui_y));
 }
 
 // Draw the cursor
-draw_sprite(spr_custom_cursor, 0, x, y);
+draw_sprite(spr_custom_cursor, 0, gui_x, gui_y);

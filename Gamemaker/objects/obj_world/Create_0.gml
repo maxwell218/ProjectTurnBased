@@ -26,11 +26,12 @@ overworld = new Overworld();
 // TODO Create player squad
 player = new Lifeform(LifeformType.Human, overworld.world_data[1][1]);
 
+// Array of points to keep track of the closest polygon's vertices
 verts = [];
 
 #region Methods
 
-function create_hex_vertices(_x, _y) {
+create_hex_vertices = function(_x, _y) {
     var verts = array_create(6);
 
     // Vertices clockwise starting from top-left corner
@@ -44,13 +45,13 @@ function create_hex_vertices(_x, _y) {
     return verts;
 }
 
-function oddq_to_pixel_center(_col, _row) {
+oddq_to_pixel_center = function(_col, _row) {
     var _cx = _col * (HEX_WIDTH * 3/4) + HEX_WIDTH/2;
     var _cy = _row * HEX_HEIGHT + HEX_HEIGHT/2 + (_col mod 2) * (HEX_HEIGHT/2);
     return [_cx, _cy];
 }
 
-function pixel_to_hex_distance(_px, _py) {
+pixel_to_hex_distance = function(_px, _py) {
 
     // Step 1: candidate odd-q hex from bounding-box
     var _col = floor(_px / (HEX_WIDTH * 3/4));
@@ -92,7 +93,7 @@ function pixel_to_hex_distance(_px, _py) {
     return [_closest_col, _closest_row];
 }
 
-function point_in_polygon(_px, _py, _verts) {
+point_in_polygon = function(_px, _py, _verts) {
     var _inside = false;
     var _n = array_length(_verts);
     

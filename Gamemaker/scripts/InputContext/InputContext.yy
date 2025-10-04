@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"InputContext",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"InputContext",
+  "parent":{
+    "name":"Controller",
+    "path":"folders/Scripts/Controller.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
