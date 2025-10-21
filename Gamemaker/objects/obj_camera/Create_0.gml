@@ -1,31 +1,34 @@
 /// @description Create camera variables
 
-#macro HORIZONTAL_MARGIN sprite_get_width(spr_hex_tile)
+#macro HORIZONTAL_MARGIN sprite_get_height(spr_hex_tile)
 #macro VERTICAL_MARGIN sprite_get_height(spr_hex_tile)
 
 target_x = 0;
 target_y = 0;
-panning_speed = 2;
+panning_speed = 2.5;
 
 #region Methods
 
 move_camera = function(_input) {
-	var _input_x = (_input[? Input.Right] - _input[? Input.Left]);
-	var _input_y = (_input[? Input.Down] - _input[? Input.Up]);
-
-	var _len = point_distance(0, 0, _input_x, _input_y);
-
-	if (_len > 0) {
-	    _input_x /= _len;
-	    _input_y /= _len;
-	}
-
-	target_x += _input_x * panning_speed;
-	target_y += _input_y * panning_speed;
 	
-	// Clamp camera
-	target_x = clamp(target_x, -HORIZONTAL_MARGIN, (room_width - camera_get_view_width(view_camera[0])) + HORIZONTAL_MARGIN);
-	target_y = clamp(target_y, -VERTICAL_MARGIN, (room_height - camera_get_view_height(view_camera[0])) + VERTICAL_MARGIN);
+    var _input_x = (_input[? Input.Right] - _input[? Input.Left]);
+    var _input_y = (_input[? Input.Down] - _input[? Input.Up]);
+
+    var _len = point_distance(0, 0, _input_x, _input_y);
+
+    if (_len > 0) {
+		
+        // Normalize to ensure consistent movement speed in diagonals
+        _input_x /= _len;
+        _input_y /= _len;
+
+        target_x += _input_x * panning_speed;
+        target_y += _input_y * panning_speed;
+    }
+
+    // Clamp camera to boundaries
+    target_x = clamp(target_x, -HORIZONTAL_MARGIN, (room_width - camera_get_view_width(view_camera[0])) + HORIZONTAL_MARGIN);
+    target_y = clamp(target_y, -VERTICAL_MARGIN, (room_height - camera_get_view_height(view_camera[0])) + VERTICAL_MARGIN);
 }
 
 #endregion

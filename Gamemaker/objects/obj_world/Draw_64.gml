@@ -1,22 +1,24 @@
 if (global.debug) {
+	
 	draw_set_valign(fa_top);
 	draw_set_halign(fa_left);
+	
+	draw_set_font(fnt_04b03);
+	
+	draw_text(x, y, "Instances: " + string(instance_count));
+	draw_text(x, y + 8, "Hexes: " + string(instance_number(obj_hex_tile)));
+	
+	draw_text(x, y + 16, "Pools: " + string(pool_rows) + ", " + string(pool_cols));
+	draw_text(x, y + 24, "Anchors: " + string(anchor_row) + ", " + string(anchor_col));
+	
+	if (hovered_hex != noone) {
 
-	var _coords = pixel_to_hex_distance(mouse_x, mouse_y);
+		var _col = hovered_hex.cell_data[CellData.Col];
+		var _row = hovered_hex.cell_data[CellData.Row];
 
-	draw_text(x, y, "Col/Row: " + string(_coords[0]) + ", " + string(_coords[1]));
-
-	// Convert col and row -> x and y
-	var _x_pos = _coords[0] * (HEX_WIDTH * 3/4);
-	var _y_pos = _coords[1] * HEX_HEIGHT + (_coords[0] mod 2) * (HEX_HEIGHT / 2);
-	draw_text(x, y + 16, "Pos: " + string(_x_pos) + ", " + string(_y_pos));
-
-	verts = create_hex_vertices(_x_pos, _y_pos);
-
-	for (var _v = 0; _v < array_length(verts); _v++) {
-		draw_circle(verts[_v][0], verts[_v][1], 1, false);	
+		draw_text(x, y + 40, "Col/Row: " + string(_col) + ", " + string(_row));
+		draw_text(x, y + 48, "Pos: " + string(hovered_hex.x) + ", " + string(hovered_hex.y));
 	}
-
-	var _inside = (point_in_polygon(mouse_x, mouse_y, verts)) ? "true" : "false";
-	draw_text(x, y + 32, _inside);
+	
+	draw_set_font(-1);
 }

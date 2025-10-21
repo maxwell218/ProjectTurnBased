@@ -25,27 +25,23 @@ function InputContext(_owner, _priority, _consume) constructor {
 	}
 
     handle_input = function(_input) {
-		
-        var _handled = false;
-        var _keys = ds_map_keys_to_array(actions);
-		
-        for (var _i = 0; _i < array_length(_keys); _i++) {
-			
-            var _action = _keys[_i];
-			
-            if (_input[? _action]) {
-				
-				with (owner) {
-					script_execute(other.actions[? _action], _input);
-				}
-				
-                //script_execute(actions[? _action], _input);
-                _handled = true;
+    var _handled = false;
+    var _keys = ds_map_keys_to_array(actions);
+
+    for (var _i = 0; _i < array_length(_keys); _i++) {
+        var _action = _keys[_i];
+
+        if (_input[? _action]) {
+            with (owner) {
+                script_execute(other.actions[? _action], _input);
             }
+
+            _handled = true;
+            break; // STOP after handling the first input
         }
-		
-		// If consumed, returns true
-		// If not handled, it means no keys were found matching the input in our obj_input
-        return _handled && consume;
     }
+
+    // If consumed, returns true
+    return _handled && consume;
+}
 }

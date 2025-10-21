@@ -3,6 +3,9 @@
 enum CellData {
 	Col,
 	Row,
+	CubeX,
+	CubeY,
+	CubeZ,
 	Terrain,
 	Cost,
 	Locations,
@@ -10,4 +13,8 @@ enum CellData {
 	Lifeforms,
 	Occupancy,
 	Last,
+}
+
+draw = function() {
+	draw_sprite(spr_hex_tiles, cell_data[CellData.Terrain], x, y);	
 }

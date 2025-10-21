@@ -13,5 +13,9 @@ input = instance_create_layer(x, y, "Controllers", obj_input);
 world = noone;
 camera = noone;
 
+// Resize room
+room_set_width(rm_world, HEX_WIDTH * WORLD_WIDTH * 3/4);
+room_set_height(rm_world, HEX_HEIGHT * WORLD_HEIGHT);
+
 // TODO Add proper game start button
 room_goto(rm_world);
