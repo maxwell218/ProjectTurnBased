@@ -170,8 +170,8 @@ init_pool_for_camera = function() {
 	var _visible_rows = ceil(_vh / HEX_HEIGHT) + 1 + BUFFER_ROWS;
 	var _visible_cols = ceil(_vw / (COL_SPACING)) + 1 + BUFFER_COLS;
 	
-	pool_rows = _visible_rows;
-	pool_cols = _visible_cols;
+	pool_rows = min(_visible_rows, WORLD_HEIGHT);
+	pool_cols = min(_visible_cols, WORLD_WIDTH);
 
     // Compute top-left anchor tile (first fully visible tile)
     var _grid = pixel_to_hex_grid(_vx, _vy);
@@ -205,82 +205,73 @@ init_pool_for_camera = function() {
 }
 
 reposition_pool = function() {
-	
+    // --- Camera → new anchor
     var _cam_x = camera_get_view_x(view_camera[0]);
     var _cam_y = camera_get_view_y(view_camera[0]);
-
     var _new_anchor = pixel_to_hex_grid(_cam_x, _cam_y);
-    var _new_anchor_row = clamp(_new_anchor[0] - 1, 0, WORLD_HEIGHT - pool_rows);
-    var _new_anchor_col = clamp(_new_anchor[1] - 1, 0, WORLD_WIDTH - pool_cols);
+    var _new_anchor_row = clamp(_new_anchor[0] - 1, 0, max(0, WORLD_HEIGHT - pool_rows));
+    var _new_anchor_col = clamp(_new_anchor[1] - 1, 0, max(0, WORLD_WIDTH - pool_cols));
 
-    var _delta_row = _new_anchor_row - anchor_row;
-    var _delta_col = _new_anchor_col - anchor_col;
-    if (_delta_row == 0 && _delta_col == 0) return;
+    if (_new_anchor_row == anchor_row && _new_anchor_col == anchor_col) return;
 
-    // --- Vertical scroll ---
-    if (_delta_row != 0) {
-        if (_delta_row > 0) { // down
-            for (var _i = 0; _i < _delta_row; _i++) {
-                var _recycle = pool[0];
-                for (var _r = 0; _r < pool_rows - 1; _r++) pool[_r] = pool[_r + 1];
-                pool[pool_rows - 1] = _recycle;
-                var _world_row = _new_anchor_row + pool_rows - 1 - _i;
-                for (var _c = 0; _c < pool_cols; _c++) {
-                    var _inst = _recycle[_c];
-                    var _world_col = _new_anchor_col + _c;
-                    var _xy = hex_grid_to_pixel(_world_row, _world_col);
-                    _inst.x = _xy[0]; _inst.y = _xy[1];
-                    _inst.cell_data = get_world_data(_world_row, _world_col).cell_data;
-                }
-            }
-        } else { // up
-            for (var _i = 0; _i < -_delta_row; _i++) {
-                var _recycle = pool[pool_rows - 1];
-                for (var _r = pool_rows - 1; _r > 0; _r--) pool[_r] = pool[_r - 1];
-                pool[0] = _recycle;
-                var _world_row = _new_anchor_row + _i;
-                for (var _c = 0; _c < pool_cols; _c++) {
-                    var _inst = _recycle[_c];
-                    var _world_col = _new_anchor_col + _c;
-                    var _xy = hex_grid_to_pixel(_world_row, _world_col);
-                    _inst.x = _xy[0]; _inst.y = _xy[1];
-                    _inst.cell_data = get_world_data(_world_row, _world_col).cell_data;
-                }
+    // --- Bounds
+    var _old_r0 = anchor_row, _old_c0 = anchor_col;
+    var _new_r0 = _new_anchor_row, _new_c0 = _new_anchor_col;
+    var _old_r1 = _old_r0 + pool_rows - 1, _old_c1 = _old_c0 + pool_cols - 1;
+    var _new_r1 = _new_r0 + pool_rows - 1, _new_c1 = _new_c0 + pool_cols - 1;
+
+    // --- Overlap region
+    var _ov_r0 = max(_old_r0, _new_r0), _ov_c0 = max(_old_c0, _new_c0);
+    var _ov_r1 = min(_old_r1, _new_r1), _ov_c1 = min(_old_c1, _new_c1);
+    var _has_overlap = (_ov_r1 >= _ov_r0) && (_ov_c1 >= _ov_c0);
+
+    // --- Collect recyclable instances
+    var _recyclables = [];
+    for (var _i = 0; _i < pool_rows; _i++) {
+        for (var _j = 0; _j < pool_cols; _j++) {
+            var _r = _old_r0 + _i, _c = _old_c0 + _j;
+            if (_r < _new_r0 || _r > _new_r1 || _c < _new_c0 || _c > _new_c1) {
+                array_push(_recyclables, pool[_i][_j]);
             }
         }
     }
 
-    // --- Horizontal scroll ---
-    if (_delta_col != 0) {
-        if (_delta_col > 0) { // right
-            for (var _j = 0; _j < _delta_col; _j++) {
-                for (var _r = 0; _r < pool_rows; _r++) {
-                    var _inst = pool[_r][0];
-                    for (var _c = 0; _c < pool_cols - 1; _c++) pool[_r][_c] = pool[_r][_c + 1];
-                    pool[_r][pool_cols - 1] = _inst;
-                    var _world_row = _new_anchor_row + _r;
-                    var _world_col = _new_anchor_col + pool_cols - 1;
-                    var _xy = hex_grid_to_pixel(_world_row, _world_col);
-                    _inst.x = _xy[0]; _inst.y = _xy[1];
-                    _inst.cell_data = get_world_data(_world_row, _world_col).cell_data;
-                }
+    // --- Create new pool
+    var _new_pool = array_create(pool_rows);
+    for (var _i = 0; _i < pool_rows; _i++) _new_pool[_i] = array_create(pool_cols);
+    var _recycle_i = 0;
+
+    // --- Fill new pool
+    for (var _i = 0; _i < pool_rows; _i++) {
+        for (var _j = 0; _j < pool_cols; _j++) {
+            var _wr = _new_r0 + _i, _wc = _new_c0 + _j;
+
+            // Reuse overlapping instance if inside both old and new regions
+            if (_has_overlap && _wr >= _ov_r0 && _wr <= _ov_r1 && _wc >= _ov_c0 && _wc <= _ov_c1) {
+                var _old_i = _wr - _old_r0, _old_j = _wc - _old_c0;
+                _new_pool[_i][_j] = pool[_old_i][_old_j];
+                continue;
             }
-        } else { // left
-            for (var _j = 0; _j < -_delta_col; _j++) {
-                for (var _r = 0; _r < pool_rows; _r++) {
-                    var _inst = pool[_r][pool_cols - 1];
-                    for (var _c = pool_cols - 1; _c > 0; _c--) pool[_r][_c] = pool[_r][_c - 1];
-                    pool[_r][0] = _inst;
-                    var _world_row = _new_anchor_row + _r;
-                    var _world_col = _new_anchor_col;
-                    var _xy = hex_grid_to_pixel(_world_row, _world_col);
-                    _inst.x = _xy[0]; _inst.y = _xy[1];
-                    _inst.cell_data = get_world_data(_world_row, _world_col).cell_data;
-                }
+
+            // Otherwise recycle an old instance
+            var _inst = _recyclables[_recycle_i++];
+            var _xy = hex_grid_to_pixel(_wr, _wc);
+            _inst.x = _xy[0];
+            _inst.y = _xy[1];
+
+            if (_wr < 0 || _wr >= WORLD_HEIGHT || _wc < 0 || _wc >= WORLD_WIDTH) {
+                _inst.visible = false;
+                _inst.cell_data = undefined;
+            } else {
+                _inst.visible = true;
+                _inst.cell_data = get_world_data(_wr, _wc).cell_data;
             }
+
+            _new_pool[_i][_j] = _inst;
         }
     }
 
+    pool = _new_pool;
     anchor_row = _new_anchor_row;
     anchor_col = _new_anchor_col;
 }
