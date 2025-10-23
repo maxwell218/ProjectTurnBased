@@ -12,6 +12,10 @@ if (global.debug) {
 		", " + string(cell_data[CellData.Row]) + ")",
 		0.5, 0.5, 0);
 		
+	draw_text_transformed(_x, _y - 8, 
+		"Cost: " + string(cell_data[CellData.Cost]),
+		0.5, 0.5, 0);
+		
 	//draw_text_transformed(_x, _y, 
 	//	"(" + string(cell_data[CellData.CubeX]) + 
 	//	", " + string(cell_data[CellData.CubeY]) + 

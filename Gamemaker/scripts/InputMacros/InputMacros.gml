@@ -3,6 +3,7 @@
 #macro KEY_DOWN					ord("S")
 #macro KEY_LEFT					ord("A")
 #macro KEY_RIGHT				ord("D")
+#macro KEY_SHIFT				vk_shift
 
 #macro KEY_PAUSE				vk_escape
 #macro KEY_ACCEPT				vk_enter

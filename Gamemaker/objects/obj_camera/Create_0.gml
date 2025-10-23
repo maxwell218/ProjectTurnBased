@@ -6,6 +6,7 @@
 target_x = 0;
 target_y = 0;
 panning_speed = 2.5;
+speed_mult = 2;
 
 #region Methods
 
@@ -21,9 +22,11 @@ move_camera = function(_input) {
         // Normalize to ensure consistent movement speed in diagonals
         _input_x /= _len;
         _input_y /= _len;
+		
+		var _mult = (_input[? Input.Shift]) ? speed_mult : 1;
 
-        target_x += _input_x * panning_speed;
-        target_y += _input_y * panning_speed;
+        target_x += _input_x * panning_speed * _mult;
+        target_y += _input_y * panning_speed * _mult;
     }
 
     // Clamp camera to boundaries
@@ -36,7 +39,7 @@ move_camera = function(_input) {
 #region Context
 
 context = new InputContext(self, ContextPriority.World, true);
-context.add_action_group([Input.Up, Input.Down, Input.Left, Input.Right], move_camera);
+context.add_action_group([Input.Up, Input.Down, Input.Left, Input.Right, Input.Shift], move_camera);
 
 #endregion
 

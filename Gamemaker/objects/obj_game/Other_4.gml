@@ -1,12 +1,17 @@
-/// @description Create the world
+/// @description Create the world, camera and lifeforms
 if (room == rm_world) {
 	
 	// Create camera object
-	camera = instance_create_layer(x, y, "UI", obj_camera);
+	global.camera = instance_create_layer(x, y, "UI", obj_camera);
 	
 	// Create world object
-	world = instance_create_layer(0, 0, "Controllers", obj_world);
+	global.world = instance_create_layer(x, y, "Controllers", obj_world);
 	
+	// Create lifeform controller object
+	global.lifeform_controller = instance_create_layer(x, y, "Controllers", obj_lifeform_controller);
 
 	// TODO Create player inventory	
+	
+	// Trigger game start condition
+	event_manager_publish(Event.GameStart);
 }

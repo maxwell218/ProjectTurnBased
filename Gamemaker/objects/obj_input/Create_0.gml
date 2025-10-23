@@ -12,7 +12,6 @@ enum InputArray {
 	Type,
 	PressType,
 	Key
-	
 }
 
 enum InputPressType {
@@ -36,9 +35,12 @@ enum Input {
 	Down,
 	Left,
 	Right,
+	Shift,
 	
 	Last
 }
+
+global.hover_context = noone;
 
 inputs = [];
 
@@ -50,6 +52,7 @@ inputs[Input.Left] =	[Device.Keyboard, InputPressType.Held,	 KEY_LEFT];
 inputs[Input.Right] =	[Device.Keyboard, InputPressType.Held,	 KEY_RIGHT];
 inputs[Input.Up] =		[Device.Keyboard, InputPressType.Held,	 KEY_UP];
 inputs[Input.Down] =	[Device.Keyboard, InputPressType.Held,	 KEY_DOWN];
+inputs[Input.Shift] =	[Device.Keyboard, InputPressType.Held,	 KEY_SHIFT];
 
 inputs[Input.Select] =	[Device.Mouse,	InputPressType.Pressed,	 KEY_SELECT];
 inputs[Input.Cancel] =	[Device.Mouse,	InputPressType.Pressed,	 KEY_CANCEL];
@@ -62,7 +65,7 @@ contexts = []; // Contains InputContext structs
 
 #endregion
 
-#region Method
+#region Methods
 
 /// @description Handles pressing, holding down and releasing a certain keyboard input
 check_keyboard_input = function(_keyboard_input, _press_type) {
@@ -115,9 +118,15 @@ handle_input_contexts = function() {
 		input_states[_i] = process_input(inputs[_i]);
 	}
 	
+	// Reset context hover
+	global.hover_context = noone;
+	
 	var _context_inputs = ds_map_create();
 	
-    // TODO Handle contexts by priority (higher priority last)
+	// Sort contexts by priority
+    array_sort(contexts, function(_a, _b) { return _a.priority - _b.priority; });
+	
+    // Handle contexts by priority (higher priority last)
     for (var _i = 0; _i < array_length(contexts); _i++) {
         
 		var _context = contexts[_i];
@@ -130,9 +139,14 @@ handle_input_contexts = function() {
             var _action = _keys[_k];
 			ds_map_set(_context_inputs, _action, input_states[_action]);
         }
+		
+		// Check if hover is captured
+		if (global.hover_context == noone && _context.check_hover()) {
+	        global.hover_context = _context;
+	    }
 
         if (_context.handle_input(_context_inputs)) {
-            break; // consumed, stop lower-priority contexts
+            break; // Consumed, stop lower-priority contexts
         }
     }
 	

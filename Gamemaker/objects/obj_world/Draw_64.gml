@@ -11,14 +11,14 @@ if (global.debug) {
 	draw_text(x, y + 16, "Pools: " + string(pool_rows) + ", " + string(pool_cols));
 	draw_text(x, y + 24, "Anchors: " + string(anchor_row) + ", " + string(anchor_col));
 	
-	if (hovered_hex != noone) {
+	//if (hovered_hex != noone) {
 
-		var _col = hovered_hex.cell_data[CellData.Col];
-		var _row = hovered_hex.cell_data[CellData.Row];
+	//	var _col = hovered_hex.cell_data[CellData.Col];
+	//	var _row = hovered_hex.cell_data[CellData.Row];
 
-		draw_text(x, y + 40, "Col/Row: " + string(_col) + ", " + string(_row));
-		draw_text(x, y + 48, "Pos: " + string(hovered_hex.x) + ", " + string(hovered_hex.y));
-	}
+	//	draw_text(x, y + 40, "Col/Row: " + string(_col) + ", " + string(_row));
+	//	draw_text(x, y + 48, "Pos: " + string(hovered_hex.x) + ", " + string(hovered_hex.y));
+	//}
 	
 	draw_set_font(-1);
 }

@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"InputContext",
   "parent":{
-    "name":"Controller",
-    "path":"folders/Scripts/Controller.yy",
+    "name":"Input",
+    "path":"folders/Scripts/Input.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",
