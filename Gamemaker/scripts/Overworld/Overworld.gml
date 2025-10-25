@@ -41,13 +41,9 @@ function Overworld() constructor {
 					_cell_data[CellData.Cost] = 1;
 					break;
 			}
-	        
 
-	        // Store lightweight struct containing the array
-	        var _cell_struct = { cell_data: _cell_data };
-
-	        world_data[_row][_col] = _cell_struct;
-			delete _cell_struct;
+	        // Store cell data
+	        world_data[_row][_col] = _cell_data;
 		}
 	}
 }

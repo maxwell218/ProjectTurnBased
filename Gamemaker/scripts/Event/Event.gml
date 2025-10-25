@@ -1,5 +1,7 @@
 enum Event {
 	// Game
+	GameNew,
+	GameLoad,
 	GameStart, // Used to initialize the game's world, camera, lifeforms, etc.
 	
 	// Inputs
@@ -9,6 +11,13 @@ enum Event {
 	// Turn
 	TurnStart, // Used at the start of a new turn
 	TurnEnd, // Used when a turn ends
+	
+	// World
+	WorldCreated,
+	CellSelected,
+	
+	// Lifeform
+	LifeformGroupCreated,
 	
 	Last
 }

@@ -1,15 +1,4 @@
 /// @description Initialize lifeform
-enum LifeformType {
-	Human,
-	Animal,
-	Monster,
-	Last
-}
-
-enum LifeformStat {
-	MovePoints,
-	Last	
-}
 
 // Stats class for the relevant lifeform
 stats = undefined;
@@ -23,10 +12,7 @@ move_range_map = undefined;
 
 #region Methods
 
-init = function(_world_cell) {
-	
-	current_tile = _world_cell;
-	last_tile = current_tile;
+init = function() {
 	update_move_range();
 }
 
@@ -45,7 +31,7 @@ update_move_range = function() {
 		ds_map_destroy(move_range_map);
 	}
 	
-	move_range_map = get_movement_range(current_tile, stats.get_stat(LifeformStat.MovePoints));
+	// move_range_map = get_movement_range(current_tile, stats.get_stat(LifeformStat.MovePoints));
 }
 
 get_movement_range = function(_start_tile, _max_cost) {
@@ -81,7 +67,5 @@ get_movement_range = function(_start_tile, _max_cost) {
 	ds_queue_destroy(_open);
 	return _cost_map;	
 }
-
-
 
 #endregion

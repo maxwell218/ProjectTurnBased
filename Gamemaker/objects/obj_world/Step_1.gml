@@ -1,3 +1,3 @@
 /// @description Reposition hex pool
 
-reposition_pool();
+update_tile_pool();

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"StaticSpawn",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"StaticSpawn",
+  "parent":{
+    "name":"World",
+    "path":"folders/Scripts/World.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

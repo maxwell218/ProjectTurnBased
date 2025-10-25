@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"LifeformGroup",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"LifeformGroup",
+  "parent":{
+    "name":"Lifeform",
+    "path":"folders/Scripts/Lifeform.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

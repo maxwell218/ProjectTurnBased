@@ -46,6 +46,12 @@ cube_neighbors = [
 // Contains the hovered hexagon object
 hovered_hex = noone;
 
+// Contains the position of all groups
+lifeform_group_positions = ds_map_create();
+
+// Contains structs of static spawns
+lifeform_spawns = [];
+
 // Pooled hexes variables
 pool = [];
 pool_rows = 0;
@@ -55,32 +61,9 @@ anchor_col = 0;
 
 #region Methods
 
-create_lifeform = function(_lifeform_type, _world_cell) {
-	
-	var _inst = noone;
-	
-	switch(_lifeform_type) {
-		default:
-			var _x = _world_cell.cell_data[CellData.X] + HEX_WIDTH div 2;
-			var _y = _world_cell.cell_data[CellData.Y] + HEX_HEIGHT div 2;
-			
-			_inst = instance_create_layer(_x, _y, "Lifeforms", obj_human);
-			
-			// Assign base stats
-			_inst.stats = new HumanStats();
-			break;
-	}
-	
-	// Link the instance to its tile struct
-    _inst.init(_world_cell.cell_data);
-	
-	array_push(_world_cell.cell_data[CellData.Lifeforms], _inst);
-	
-	return _inst;
-}
-
 /// @description Returns all neighbor structs from cell data
 get_hex_neighbors = function(_cell_data) {
+	
 	var _cube_x = _cell_data[CellData.CubeX];
 	var _cube_y = _cell_data[CellData.CubeY];
 	
@@ -94,7 +77,7 @@ get_hex_neighbors = function(_cell_data) {
 		var _coords = cube_to_offset(_new_x, _new_y);
 		
 		if (is_valid_coord(_coords[0], _coords[1])) {
-			array_push(_neighbors, overworld.world_data[_coords[0]][_coords[1]].cell_data);
+			array_push(_neighbors, overworld.world_data[_coords[0]][_coords[1]]);
 		}
 	}
 	
@@ -197,7 +180,7 @@ init_pool_for_camera = function() {
             var _xy = hex_grid_to_pixel(_world_row, _world_col);
             var _inst = instance_create_layer(_xy[0], _xy[1], "Tiles", obj_hex_tile);
 
-            _inst.cell_data = get_world_data(_world_row, _world_col).cell_data;
+            _inst.cell_data = get_world_data(_world_row, _world_col);
 
             pool[_i][_j] = _inst;
         }
@@ -205,7 +188,8 @@ init_pool_for_camera = function() {
 }
 
 reposition_pool = function() {
-    // --- Camera → new anchor
+	
+    // --- Camera -> new anchor
     var _cam_x = camera_get_view_x(view_camera[0]);
     var _cam_y = camera_get_view_y(view_camera[0]);
     var _new_anchor = pixel_to_hex_grid(_cam_x, _cam_y);
@@ -258,14 +242,7 @@ reposition_pool = function() {
             var _xy = hex_grid_to_pixel(_wr, _wc);
             _inst.x = _xy[0];
             _inst.y = _xy[1];
-
-            if (_wr < 0 || _wr >= WORLD_HEIGHT || _wc < 0 || _wc >= WORLD_WIDTH) {
-                _inst.visible = false;
-                _inst.cell_data = undefined;
-            } else {
-                _inst.visible = true;
-                _inst.cell_data = get_world_data(_wr, _wc).cell_data;
-            }
+			_inst.cell_data = get_world_data(_wr, _wc);
 
             _new_pool[_i][_j] = _inst;
         }
@@ -274,6 +251,28 @@ reposition_pool = function() {
     pool = _new_pool;
     anchor_row = _new_anchor_row;
     anchor_col = _new_anchor_col;
+}
+
+update_tile_pool = function() {
+	
+    var _cam = view_camera[0];
+    var _vx  = camera_get_view_x(_cam);
+    var _vy  = camera_get_view_y(_cam);
+    var _grid = pixel_to_hex_grid(_vx, _vy);
+
+    var _new_row = clamp(_grid[0] - 1, 0, WORLD_HEIGHT - pool_rows);
+    var _new_col = clamp(_grid[1] - 1, 0, WORLD_WIDTH - pool_cols);
+
+    // Check how far the camera moved in tile space
+    var _dr = abs(_new_row - anchor_row);
+    var _dc = abs(_new_col - anchor_col);
+
+    // If the jump exceeds the pool, just re-init (teleport case)
+    if (_dr >= pool_rows || _dc >= pool_cols) {
+        init_pool_for_camera();
+    } else {
+        reposition_pool(); // Smooth scroll case
+    }
 }
 
 get_path = function(_start_tile, _goal_tile, _max_distance = undefined) {
@@ -285,7 +284,7 @@ get_path = function(_start_tile, _goal_tile, _max_distance = undefined) {
     ds_priority_add(_open, _start_tile, 0);
     ds_map_add(_cost_so_far, _start_tile, 0);
 
-    var _closest = _start_tile; // fallback if goal not reached
+    var _closest = _start_tile; // Fallback if goal not reached
     var _closest_dist = get_hex_distance(_start_tile, _goal_tile);
 
     while (!ds_priority_empty(_open)) {
@@ -343,7 +342,16 @@ get_path = function(_start_tile, _goal_tile, _max_distance = undefined) {
 }
 
 get_hovered_tile = function() {
+	
 	hovered_hex = collision_point(mouse_x, mouse_y, obj_hex_tile, true, false);
+}
+
+on_hex_click = function(_input) {
+	
+	// TODO Send ui button as well (Scout, Run, etc.)
+	if (hovered_hex != noone) {
+		event_manager_publish(Event.CellSelected, hovered_hex.cell_data);
+	}
 }
 
 draw_tiles_in_view = function() {
@@ -371,22 +379,6 @@ draw_tiles_in_view = function() {
     }
 }
 
-on_hex_click = function(_input) {
-	
-	if (hovered_hex != noone) {
-		
-		// Check if hovered tile is within movement range
-		
-		if (!player.is_reachable_tile(hovered_hex.cell_data)) {
-			exit;
-		}
-		
-
-		var _path = get_path(player.current_tile, hovered_hex.cell_data, player.stats.get_stat(LifeformStat.MovePoints));
-		show_debug_message(array_length(_path));
-	}
-}
-
 #endregion
 
 #region Context
@@ -401,11 +393,26 @@ context.set_hover_method(get_hovered_tile);
 
 event_manager_subscribe(Event.GameStart, function() {
 	
+	// Initialise factions
+	
+	
+	// Initialise spawns
+	array_push(lifeform_spawns, new StaticSpawn(5, 7));
+	array_push(lifeform_spawns, new StaticSpawn(10, 12));
+	
 	// Initialize camera
 	init_pool_for_camera();
+	
+	event_manager_publish(Event.WorldCreated);
+});
 
-	// Create player squad
-	player = create_lifeform(LifeformType.Human, overworld.world_data[3][2]);
+event_manager_subscribe(Event.LifeformGroupCreated, function(_lifeform_group) {
+	
+	// TODO Get a valid spawn
+	_spawn_cell = lifeform_spawns[irandom(array_length(lifeform_spawns))];
+	
+	// Add group to lookup map
+	ds_map_add(lifeform_group_positions, _lifeform_group.group_id, _spawn_cell);
 });
 
 event_manager_publish(Event.AddContext, context);

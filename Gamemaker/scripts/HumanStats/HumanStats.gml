@@ -1,17 +1,19 @@
 
 function HumanStats() constructor {
+	
 	base = [];
 	
 	base[LifeformStat.MovePoints] = 5;
+	
+	// Array of structs {source, target, value}
+    modifiers = [];
 
-    modifiers = []; // array of structs {source, target, value}
-
-    // --- Helper methods ---
+    #region Methods
 
     add_modifier = function(_source, _target, _value) {
         var _mod = { source: _source, target: _target, value: _value };
         array_push(modifiers, _mod);
-    };
+    }
 
     remove_modifier = function(_source) {
         for (var _i = array_length(modifiers) - 1; _i >= 0; _i--) {
@@ -19,7 +21,7 @@ function HumanStats() constructor {
                 array_delete(modifiers, _i, 1);
             }
         }
-    };
+    }
 
     get_stat = function(_name) {
         var _value = base[_name];
@@ -31,4 +33,5 @@ function HumanStats() constructor {
         return _value;
     }
 	
+	#endregion
 }
