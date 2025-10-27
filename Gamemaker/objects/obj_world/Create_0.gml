@@ -409,7 +409,7 @@ event_manager_subscribe(Event.GameStart, function() {
 event_manager_subscribe(Event.LifeformGroupCreated, function(_lifeform_group) {
 	
 	// TODO Get a valid spawn
-	_spawn_cell = lifeform_spawns[irandom(array_length(lifeform_spawns))];
+	_spawn_cell = lifeform_spawns[irandom_range(0, array_length(lifeform_spawns) - 1)];
 	
 	// Add group to lookup map
 	ds_map_add(lifeform_group_positions, _lifeform_group.group_id, _spawn_cell);
