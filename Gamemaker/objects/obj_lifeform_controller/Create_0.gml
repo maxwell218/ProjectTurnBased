@@ -18,79 +18,92 @@ enum LifeformStat {
 	Last	
 }
 
+#region Methods
+
+create_lifeform = function(_lifeform_type) {
+	var _stats = undefined;
+	
+	switch (_lifeform_type) {
+		case LifeformType.Human:
+		default:
+			_stats = new HumanStats();
+			break;
+	}
+	
+	return new LifeformMember(_lifeform_type, _stats);
+}
+
+create_lifeform_group = function(_members, _faction, _id = undefined) {
+	
+	// TODO Assign leader (maybe _members[0] or based on stats?)
+	var _lifeform_group = new LifeformGroup(_members, undefined, _faction, _id);
+	
+	// Add the new group to the map
+	ds_map_add(lifeform_groups, _lifeform_group.group_id, _lifeform_group);
+	
+	return _lifeform_group;
+}
+
+create_player_lifeform = function() {
+	
+	// TODO Give starting traits and stats
+	return create_lifeform(LifeformType.Human);
+}
+
+get_player_lifeform_group = function() {
+	
+	return lifeform_groups[? PLAYER_GROUP_ID];	
+}
+
+is_movement_active = function() {
+	return time_source_get_state(lifeform_group_movement_timer) == time_source_state_active;
+}
+
+move_group_along_path = function(_lifeform_group) {
+	
+	// If we still have a tile to move towards
+    if (array_length(lifeform_group_path) > 0) {
+		
+        var _next_tile = lifeform_group_path[0];
+		
+		// Move lifeform group on world map
+		global.world.move_lifeform_group(_lifeform_group, _next_tile);
+		
+		// Move lifeform group (members) to the center of the next tile
+		_lifeform_group.set_new_tile(_next_tile);
+
+        /// Remove the tile we just stepped onto
+        array_delete(lifeform_group_path, 0, 1);
+    }
+	
+	// TODO Check if we triggered an encounter
+	
+	// Stop the time source if we've reached the end of the path / reached an encounter
+	if (array_length(lifeform_group_path) <= 0) {
+		
+		time_source_stop(lifeform_group_movement_timer);
+		time_source_reset(lifeform_group_movement_timer);
+		
+		event_manager_publish(Event.LifeformGroupDestinationReached, _lifeform_group);
+	}
+}
+
+#endregion
+
+#region Variables
+
 // Keeps track of whose turn it is
 current_turn = TurnOrder.Player;
 
 // Keeps track of all active lifeforms in the current world
 lifeform_groups = ds_map_create();
 
-#region Methods
+// Used to move lifeform groups one tile at a time
+lifeform_group_movement_duration = 0.4 // Duration for each step in seconds
+lifeform_group_movement_timer = time_source_create(time_source_game, lifeform_group_movement_duration, time_source_units_seconds, move_group_along_path, [], -1);
 
-create_lifeform = function(_lifeform_type, _world_cell) {
-	
-	var _inst = noone;
-	
-	switch(_lifeform_type) {
-		default:
-			var _x = _world_cell[CellData.X] + HEX_WIDTH div 2;
-			var _y = _world_cell[CellData.Y] + HEX_HEIGHT div 2;
-			
-			_inst = instance_create_layer(_x, _y, "Lifeforms", obj_human);
-			
-			// Assign base stats
-			_inst.stats = new HumanStats();
-			break;
-	}
-	
-	// Link the instance to its tile struct
-    _inst.init();
-	
-	array_push(_world_cell[CellData.Lifeforms], _inst);
-	
-	return _inst;
-}
-
-create_lifeform_group = function(_id = undefined) {
-	
-	var _lifeform_group = undefined;
-	return new LifeformGroup(undefined, undefined, undefined);
-}
-
-move_lifeform = function(_lifeform, _next_tile) {
-	
-	// We need to remove the lifeform reference within the current tile
-	
-	//var _lifeform_index = 
-	
-	//array_delete(_lifeform.current_tile[CellData.Lifeforms], _lifeform_index, 1);
-	
-	//var _old_tile = get_world_data(_lifeform.current_tile[CellData.Row], _lifeform.current_tile[CellData.Col]);
-
-	//show_debug_message(_old_tile);
-	//show_debug_message(_lifeform.current_tile);
-	//show_debug_message(overworld.world_data[0][0]);
-}
-
-move_along_path = function(_lifeform, _path) {
-	
-    if (array_length(_path) > 0) {
-		
-        var _next_tile = _path[0];
-        
-        // Move the lifeform to the center of the next tile
-        _lifeform.x = _next_tile[CellData.X] + HEX_WIDTH div 2;
-        _lifeform.y = _next_tile[CellData.Y] + HEX_HEIGHT div 2;
-		
-		// Move lifeform on world map
-		global.world.move_lifeform(_lifeform, _next_tile);
-
-        ///// Remove the tile we just stepped onto
-        //array_delete(_path, 0, 1);
-
-        //// Trigger the controller alarm for the next step
-        //obj_lifeform_controller.alarm[0] = STEP_DELAY; // STEP_DELAY = frames to wait
-    } 
-}
+// Keeps track of the path a lifeform group should follow
+lifeform_group_path = [];
 
 #endregion
 
@@ -98,13 +111,21 @@ move_along_path = function(_lifeform, _path) {
 
 event_manager_subscribe(Event.WorldCreated, function() {
 	
-	// Create player group
-	var _player_group = create_lifeform_group(PLAYER_GROUP_ID);
+	// Create player lifeform
+	var _player_group = [];
 	
-	event_manager_publish(Event.LifeformGroupCreated, _player_group);
+	// TODO Only one lifeform at start
+	_player_group[0] = create_lifeform(LifeformType.Human);
+	_player_group[1] = create_lifeform(LifeformType.Human);
+	_player_group[2] = create_lifeform(LifeformType.Human);
+	_player_group[3] = create_lifeform(LifeformType.Human);
+	
+	// Create player lifeform group
+	var _player_lifeform_group = create_lifeform_group(_player_group, undefined, PLAYER_GROUP_ID);
+	
+	event_manager_publish(Event.LifeformGroupCreated, _player_lifeform_group);
 	
 	// TODO Generate other lifeforms
-	
 });
 
 event_manager_subscribe(Event.TurnEnd, function() {
@@ -112,18 +133,33 @@ event_manager_subscribe(Event.TurnEnd, function() {
 	current_turn = (current_turn == TurnOrder.Player)? TurnOrder.Ai : TurnOrder.Player;
 });
 
-event_manager_subscribe(Event.CellSelected, function(_cell_data) {
+event_manager_subscribe(Event.WorldCellSelected, function(_cell_data) {
 	
-	// Check if tile is within movement range
+	// Check if we are already moving a group
+	if (is_movement_active()) {
+		return;	
+	}
 	
-	//if (!player.is_reachable_tile(hovered_hex.cell_data)) {
-	//	show_debug_message("Out of range!");
-	//	exit;
-	//}
+	// Get player lifeform group
+	var _player_group = get_player_lifeform_group();
+	
+	// Check if tile is within movement range of group
+	if (!_player_group.is_reachable_tile(_cell_data)) {
+		show_debug_message("Out of range!");
+		exit;
+	}
 
-	//var _path = get_path(player.current_tile, hovered_hex.cell_data, player.stats.get_stat(LifeformStat.MovePoints));
-		
-	//global.lifeform_controller.move_along_path(player, _path);
+	lifeform_group_path = global.world.get_path(_player_group.current_tile, _cell_data, _player_group.get_min_movement_range());
+	
+	// Configure and start time source	
+	time_source_reconfigure(lifeform_group_movement_timer, lifeform_group_movement_duration, time_source_units_seconds, move_group_along_path, [_player_group], -1);
+	time_source_start(lifeform_group_movement_timer);
+});
+
+event_manager_subscribe(Event.LifeformGroupDestinationReached, function(_lifeform_group) {
+	
+	// Update move range maps
+	_lifeform_group.on_movement_end();
 });
 
 #endregion

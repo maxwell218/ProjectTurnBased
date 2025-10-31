@@ -1,7 +1,5 @@
 /// @description Create inputs
 
-#region Inputs
-
 enum Device {
 	Mouse,
 	Keyboard,
@@ -39,31 +37,6 @@ enum Input {
 	
 	Last
 }
-
-global.hover_context = noone;
-
-inputs = [];
-
-inputs[Input.Back] =	[Device.Keyboard, InputPressType.Pressed, KEY_BACK];
-inputs[Input.Accept] =	[Device.Keyboard, InputPressType.Pressed, KEY_ACCEPT];
-inputs[Input.Pause] =	[Device.Keyboard, InputPressType.Pressed, KEY_PAUSE];
-
-inputs[Input.Left] =	[Device.Keyboard, InputPressType.Held,	 KEY_LEFT];
-inputs[Input.Right] =	[Device.Keyboard, InputPressType.Held,	 KEY_RIGHT];
-inputs[Input.Up] =		[Device.Keyboard, InputPressType.Held,	 KEY_UP];
-inputs[Input.Down] =	[Device.Keyboard, InputPressType.Held,	 KEY_DOWN];
-inputs[Input.Shift] =	[Device.Keyboard, InputPressType.Held,	 KEY_SHIFT];
-
-inputs[Input.Select] =	[Device.Mouse,	InputPressType.Pressed,	 KEY_SELECT];
-inputs[Input.Cancel] =	[Device.Mouse,	InputPressType.Pressed,	 KEY_CANCEL];
-
-// Array containing the states for the inputs
-input_states = array_create(0);
-
-// Context array for handling inputs with multiple menus/game components
-contexts = []; // Contains InputContext structs
-
-#endregion
 
 #region Methods
 
@@ -152,6 +125,33 @@ handle_input_contexts = function() {
 	
 	ds_map_destroy(_context_inputs);
 }
+
+#endregion
+
+#region Inputs
+
+global.hover_context = noone;
+
+inputs = [];
+
+inputs[Input.Back] =	[Device.Keyboard, InputPressType.Pressed, KEY_BACK];
+inputs[Input.Accept] =	[Device.Keyboard, InputPressType.Pressed, KEY_ACCEPT];
+inputs[Input.Pause] =	[Device.Keyboard, InputPressType.Pressed, KEY_PAUSE];
+
+inputs[Input.Left] =	[Device.Keyboard, InputPressType.Held,	 KEY_LEFT];
+inputs[Input.Right] =	[Device.Keyboard, InputPressType.Held,	 KEY_RIGHT];
+inputs[Input.Up] =		[Device.Keyboard, InputPressType.Held,	 KEY_UP];
+inputs[Input.Down] =	[Device.Keyboard, InputPressType.Held,	 KEY_DOWN];
+inputs[Input.Shift] =	[Device.Keyboard, InputPressType.Held,	 KEY_SHIFT];
+
+inputs[Input.Select] =	[Device.Mouse,	InputPressType.Pressed,	 KEY_SELECT];
+inputs[Input.Cancel] =	[Device.Mouse,	InputPressType.Pressed,	 KEY_CANCEL];
+
+// Array containing the states for the inputs
+input_states = array_create(0);
+
+// Context array for handling inputs with multiple menus/game components
+contexts = []; // Contains InputContext structs
 
 #endregion
 

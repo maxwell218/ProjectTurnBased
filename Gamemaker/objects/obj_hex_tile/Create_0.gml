@@ -12,7 +12,7 @@ enum CellData {
 	Cost,
 	Locations,
 	Loot,
-	Lifeforms,
+	LifeformGroups,
 	Occupancy,
 	Last,
 }
@@ -23,13 +23,14 @@ draw = function() {
 	// Draw the terrain
 	draw_sprite(spr_hex_tiles, cell_data[CellData.Terrain], x, y);
 	
-	// Draw the lifeforms
-	var _lifeform_count = array_length(cell_data[CellData.Lifeforms]);
+	// Draw the lifeform groups
+	var _lifeform_count = array_length(cell_data[CellData.LifeformGroups]);
 	
+	// TODO Draw 2 groups max, priority for player group and allow swapping viewed group
 	if (_lifeform_count > 0) {
 		
 		for (var _i = 0; _i < _lifeform_count; _i++) {
-			cell_data[CellData.Lifeforms][_i].draw();
+			cell_data[CellData.LifeformGroups][_i].draw();
 		}
 	}
 }

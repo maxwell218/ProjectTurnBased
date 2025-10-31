@@ -26,7 +26,7 @@ function Overworld() constructor {
 	        _cell_data[CellData.CubeY] = _cube_y;
 	        _cell_data[CellData.CubeZ] = _cube_z;
 			
-	        _cell_data[CellData.Lifeforms] = [];
+	        _cell_data[CellData.LifeformGroups] = [];
 
 	        // Example content
 	        _cell_data[CellData.Terrain] = irandom_range(0, sprite_get_number(spr_hex_tiles) - 1);

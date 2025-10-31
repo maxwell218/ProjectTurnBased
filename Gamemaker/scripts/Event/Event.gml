@@ -1,8 +1,7 @@
 enum Event {
 	// Game
-	GameNew,
-	GameLoad,
-	GameStart, // Used to initialize the game's world, camera, lifeforms, etc.
+	GameNew, // Used to initialize the game's world, camera, lifeforms, etc.
+	GameLoad, // Used to determine if we loaded a save
 	
 	// Inputs
 	AddContext, // Used for adding a new context menu for input handling
@@ -13,11 +12,13 @@ enum Event {
 	TurnEnd, // Used when a turn ends
 	
 	// World
-	WorldCreated,
-	CellSelected,
+	WorldCreated, // When a new world is created (GameNew)
+	WorldLoaded,
+	WorldCellSelected,
 	
 	// Lifeform
 	LifeformGroupCreated,
+	LifeformGroupDestinationReached,
 	
 	Last
 }

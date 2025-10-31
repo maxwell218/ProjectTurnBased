@@ -1,6 +1,6 @@
 /// @description Create all world components
-#macro WORLD_HEIGHT 100
-#macro WORLD_WIDTH 100
+#macro WORLD_HEIGHT 20
+#macro WORLD_WIDTH 20
 
 #macro HEX_HEIGHT sprite_get_height(spr_hex_tile)
 #macro HEX_WIDTH sprite_get_width(spr_hex_tile)
@@ -10,6 +10,7 @@
 
 #macro COL_SPACING HEX_WIDTH * 3/4
 #macro HALF_HEX_HEIGHT HEX_HEIGHT div 2
+#macro HALF_HEX_WIDTH HEX_WIDTH div 2
 
 // Define terrain types
 enum TerrainType {
@@ -33,31 +34,6 @@ enum CubeCoordinate {
 	CubeZ,
 	Last
 }
-
-// Create overworld
-overworld = new Overworld();
-
-// Cube neighbors lookup array
-cube_neighbors = [
-    [+1, -1, 0], [+1, 0, -1], [0, +1, -1],
-    [-1, +1, 0], [-1, 0, +1], [0, -1, +1]
-];
-
-// Contains the hovered hexagon object
-hovered_hex = noone;
-
-// Contains the position of all groups
-lifeform_group_positions = ds_map_create();
-
-// Contains structs of static spawns
-lifeform_spawns = [];
-
-// Pooled hexes variables
-pool = [];
-pool_rows = 0;
-pool_cols = 0;
-anchor_row = 0;
-anchor_col = 0;
 
 #region Methods
 
@@ -341,6 +317,32 @@ get_path = function(_start_tile, _goal_tile, _max_distance = undefined) {
     return _path;
 }
 
+move_lifeform_group = function(_lifeform_group, _next_tile) {
+	
+	// Remove group from their old tile
+	var _old_row = _lifeform_group.current_tile[CellData.Row];
+	var _old_col = _lifeform_group.current_tile[CellData.Col];
+	
+	var _old_tile = get_world_data(_old_row, _old_col);
+	
+	// Find the group on the tile's lifeform array
+	var _lifeform_group_count = array_length(_old_tile[CellData.LifeformGroups]);
+	for (var _i = 0; _i < _lifeform_group_count; _i++) {
+		
+		var _group = _old_tile[CellData.LifeformGroups][_i];
+		
+		// Match found
+		if (_group.group_id == _lifeform_group.group_id) {
+			array_delete(_old_tile[CellData.LifeformGroups], _i, 1);
+		}
+	}
+	
+	array_push(_next_tile[CellData.LifeformGroups], _lifeform_group);
+	
+	// Move group on position map
+	lifeform_group_positions[? _lifeform_group.group_id] = _next_tile;
+}
+
 get_hovered_tile = function() {
 	
 	hovered_hex = collision_point(mouse_x, mouse_y, obj_hex_tile, true, false);
@@ -350,7 +352,7 @@ on_hex_click = function(_input) {
 	
 	// TODO Send ui button as well (Scout, Run, etc.)
 	if (hovered_hex != noone) {
-		event_manager_publish(Event.CellSelected, hovered_hex.cell_data);
+		event_manager_publish(Event.WorldCellSelected, hovered_hex.cell_data);
 	}
 }
 
@@ -381,6 +383,35 @@ draw_tiles_in_view = function() {
 
 #endregion
 
+#region Variables
+
+// Create overworld
+overworld = new Overworld();
+
+// Cube neighbors lookup array
+cube_neighbors = [
+    [+1, -1, 0], [+1, 0, -1], [0, +1, -1],
+    [-1, +1, 0], [-1, 0, +1], [0, -1, +1]
+];
+
+// Contains the hovered hexagon object
+hovered_hex = noone;
+
+// Contains the position of all groups (id -> cell_data)
+lifeform_group_positions = ds_map_create();
+
+// Contains structs of static spawns
+lifeform_spawns = [];
+
+// Pooled hexes variables
+pool = [];
+pool_rows = 0;
+pool_cols = 0;
+anchor_row = 0;
+anchor_col = 0;
+
+#endregion
+
 #region Context
 
 context = new InputContext(self, ContextPriority.World, true);
@@ -391,13 +422,13 @@ context.set_hover_method(get_hovered_tile);
 
 #region Events
 
-event_manager_subscribe(Event.GameStart, function() {
+event_manager_subscribe(Event.GameNew, function() {
 	
-	// Initialise factions
+	// TODO Initialise factions
 	
 	
 	// Initialise spawns
-	array_push(lifeform_spawns, new StaticSpawn(5, 7));
+	array_push(lifeform_spawns, new StaticSpawn(2, 5));
 	array_push(lifeform_spawns, new StaticSpawn(10, 12));
 	
 	// Initialize camera
@@ -408,11 +439,23 @@ event_manager_subscribe(Event.GameStart, function() {
 
 event_manager_subscribe(Event.LifeformGroupCreated, function(_lifeform_group) {
 	
-	// TODO Get a valid spawn
+	// Get a valid spawn
 	_spawn_cell = lifeform_spawns[irandom_range(0, array_length(lifeform_spawns) - 1)];
 	
-	// Add group to lookup map
-	ds_map_add(lifeform_group_positions, _lifeform_group.group_id, _spawn_cell);
+	var _world_cell = get_world_data(_spawn_cell.row, _spawn_cell.col);
+	
+	if (_world_cell == undefined) {
+		show_debug_message("Invalid spawn for lifeform group: " + string(_lifeform_group.group_id));
+		
+		ds_map_delete(global.lifeform_controller.lifeform_groups, _lifeform_group.group_id);
+		_lifeform_group.destroy();
+		delete _lifeform_group;
+		return;
+	}
+	
+	// Initialize group instances and their position on our ds map
+	_lifeform_group.init(_world_cell);
+	ds_map_add(lifeform_group_positions, _lifeform_group.group_id, _world_cell);
 });
 
 event_manager_publish(Event.AddContext, context);

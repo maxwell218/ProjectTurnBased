@@ -13,5 +13,5 @@ if (room == rm_world) {
 	// TODO Create player inventory	
 	
 	// Trigger game start condition
-	event_manager_publish(Event.GameStart);
+	event_manager_publish(Event.GameNew);
 }

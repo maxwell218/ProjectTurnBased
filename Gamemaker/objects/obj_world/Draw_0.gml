@@ -6,19 +6,10 @@ draw_set_halign(fa_center);
 	
 draw_set_font(fnt_04b03);
 
-if (variable_instance_exists(self, "player") && player.move_range_map != undefined) {
-	var _keys = ds_map_keys_to_array(player.move_range_map);
-	for (var _i = 0; _i < array_length(_keys); _i++) {
-	    var _tile = _keys[_i];
+var _player_group = global.lifeform_controller.lifeform_groups[? PLAYER_GROUP_ID];
 
-	    // Draw translucent overlay on each reachable tile
-	    var _cost = player.move_range_map[? _tile];
-		
-		if _cost == 0 continue;
-		
-		draw_sprite_ext(spr_hex_tile_hover, 0, _tile[CellData.X], _tile[CellData.Y], 1, 1, 0, c_aqua, 0.5);
-	    draw_text(_tile[CellData.X] + HEX_WIDTH div 2, _tile[CellData.Y] + HEX_HEIGHT - 8, string(_cost));
-	}
+if (_player_group != undefined && global) {
+	_player_group.draw_move_range();
 }
 
 if (hovered_hex != noone) {

@@ -1,4 +1,3 @@
-
 function HumanStats() constructor {
 	
 	base = [];
@@ -23,7 +22,7 @@ function HumanStats() constructor {
         }
     }
 
-    get_stat = function(_name) {
+    get_final_stat = function(_name) {
         var _value = base[_name];
         if (is_undefined(_value)) return 0;
         for (var _i = 0; _i < array_length(modifiers); _i++) {

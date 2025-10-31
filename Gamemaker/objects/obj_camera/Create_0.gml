@@ -3,11 +3,6 @@
 #macro HORIZONTAL_MARGIN sprite_get_height(spr_hex_tile)
 #macro VERTICAL_MARGIN sprite_get_height(spr_hex_tile)
 
-target_x = 0;
-target_y = 0;
-panning_speed = 2.5;
-speed_mult = 2;
-
 #region Methods
 
 move_camera = function(_input) {
@@ -33,6 +28,15 @@ move_camera = function(_input) {
     target_x = clamp(target_x, -HORIZONTAL_MARGIN, (room_width - camera_get_view_width(view_camera[0])) + HORIZONTAL_MARGIN);
     target_y = clamp(target_y, -VERTICAL_MARGIN, (room_height - camera_get_view_height(view_camera[0])) + VERTICAL_MARGIN);
 }
+
+#endregion
+
+#region Variables
+
+target_x = 0;
+target_y = 0;
+panning_speed = 2.5;
+speed_mult = 2;
 
 #endregion
 

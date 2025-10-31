@@ -2,7 +2,7 @@
   "$GMProject":"v1",
   "%Name":"ProjectTurnBased",
   "AudioGroups":[
-    {"$GMAudioGroup":"","%Name":"audiogroup_default","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
+    {"$GMAudioGroup":"v1","%Name":"audiogroup_default","exportDir":"","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
   ],
   "configs":{
     "children":[],
@@ -25,6 +25,7 @@
     {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Config","folderPath":"folders/Scripts/Config.yy","name":"Config","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Event","folderPath":"folders/Scripts/Event.yy","name":"Event","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Inventory","folderPath":"folders/Scripts/Inventory.yy","name":"Inventory","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Input","folderPath":"folders/Scripts/Input.yy","name":"Input","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Lifeform","folderPath":"folders/Scripts/Lifeform.yy","name":"Lifeform","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Faction","folderPath":"folders/Scripts/Lifeform/Faction.yy","name":"Faction","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -42,7 +43,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.13.1.193",
+    "IDEVersion":"2024.14.0.207",
   },
   "name":"ProjectTurnBased",
   "resources":[
@@ -55,9 +56,9 @@
     {"id":{"name":"obj_input","path":"objects/obj_input/obj_input.yy",},},
     {"id":{"name":"obj_inventory","path":"objects/obj_inventory/obj_inventory.yy",},},
     {"id":{"name":"obj_lifeform_controller","path":"objects/obj_lifeform_controller/obj_lifeform_controller.yy",},},
-    {"id":{"name":"obj_lifeform_parent","path":"objects/obj_lifeform_parent/obj_lifeform_parent.yy",},},
     {"id":{"name":"obj_world","path":"objects/obj_world/obj_world.yy",},},
     {"id":{"name":"rm_init","path":"rooms/rm_init/rm_init.yy",},},
+    {"id":{"name":"rm_inventory","path":"rooms/rm_inventory/rm_inventory.yy",},},
     {"id":{"name":"rm_world","path":"rooms/rm_world/rm_world.yy",},},
     {"id":{"name":"Event","path":"scripts/Event/Event.yy",},},
     {"id":{"name":"EventManager","path":"scripts/EventManager/EventManager.yy",},},
@@ -66,6 +67,7 @@
     {"id":{"name":"InputContext","path":"scripts/InputContext/InputContext.yy",},},
     {"id":{"name":"InputMacros","path":"scripts/InputMacros/InputMacros.yy",},},
     {"id":{"name":"LifeformGroup","path":"scripts/LifeformGroup/LifeformGroup.yy",},},
+    {"id":{"name":"LifeformMember","path":"scripts/LifeformMember/LifeformMember.yy",},},
     {"id":{"name":"Overworld","path":"scripts/Overworld/Overworld.yy",},},
     {"id":{"name":"StaticSpawn","path":"scripts/StaticSpawn/StaticSpawn.yy",},},
     {"id":{"name":"spr_custom_cursor","path":"sprites/spr_custom_cursor/spr_custom_cursor.yy",},},
@@ -80,6 +82,7 @@
   "RoomOrderNodes":[
     {"roomId":{"name":"rm_init","path":"rooms/rm_init/rm_init.yy",},},
     {"roomId":{"name":"rm_world","path":"rooms/rm_world/rm_world.yy",},},
+    {"roomId":{"name":"rm_inventory","path":"rooms/rm_inventory/rm_inventory.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[
