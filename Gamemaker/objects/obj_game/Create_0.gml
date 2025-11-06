@@ -24,5 +24,6 @@ room_set_width(rm_world, HEX_WIDTH * WORLD_WIDTH * 3/4);
 room_set_height(rm_world, HEX_HEIGHT * WORLD_HEIGHT);
 
 // TODO Add proper main menu
+room_goto(rm_health_system);
 // room_goto(rm_inventory);
-room_goto(rm_world);
+// room_goto(rm_world);

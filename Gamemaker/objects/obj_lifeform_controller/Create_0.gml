@@ -1,4 +1,4 @@
-/// @description Define turn order
+/// @description Initialize all lifeform variables
 
 enum TurnOrder {
 	Player,
@@ -14,13 +14,38 @@ enum LifeformType {
 }
 
 enum LifeformStat {
+	
+	// Health
+	CurrentHealth,
+	MaxHealth,
+	
+	// Morale
+	CurrentMorale,
+	MaxMorale,
+	
+	// Tiredness
+	CurrentFatigue,
+	MaxFatigue,
+	
+	// Needs
+	CurrentHunger,
+	MaxHunger,
+	CurrentThirst,
+	MaxThirst,
+	
+	// Strength, used for carry capacity, base damage calculations
+	Strength,
+	
+	// Movement
 	MovePoints,
+	
 	Last	
 }
 
 #region Methods
 
 create_lifeform = function(_lifeform_type) {
+	
 	var _stats = undefined;
 	
 	switch (_lifeform_type) {
@@ -52,10 +77,11 @@ create_player_lifeform = function() {
 
 get_player_lifeform_group = function() {
 	
-	return lifeform_groups[? PLAYER_GROUP_ID];	
+	return lifeform_groups[? PLAYER_GROUP_ID];
 }
 
 is_movement_active = function() {
+	
 	return time_source_get_state(lifeform_group_movement_timer) == time_source_state_active;
 }
 
@@ -99,7 +125,7 @@ current_turn = TurnOrder.Player;
 lifeform_groups = ds_map_create();
 
 // Used to move lifeform groups one tile at a time
-lifeform_group_movement_duration = 0.4 // Duration for each step in seconds
+lifeform_group_movement_duration = 0.35 // Duration for each step in seconds
 lifeform_group_movement_timer = time_source_create(time_source_game, lifeform_group_movement_duration, time_source_units_seconds, move_group_along_path, [], -1);
 
 // Keeps track of the path a lifeform group should follow

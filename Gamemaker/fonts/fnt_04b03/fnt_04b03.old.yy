@@ -1,7 +1,7 @@
 {
   "$GMFont":"",
   "%Name":"fnt_04b03",
-  "AntiAlias":1,
+  "AntiAlias":0,
   "applyKerning":0,
   "ascender":6,
   "ascenderOffset":0,
@@ -107,7 +107,7 @@
     "124":{"character":124,"h":8,"offset":0,"shift":2,"w":1,"x":22,"y":12,},
     "125":{"character":125,"h":8,"offset":0,"shift":4,"w":3,"x":17,"y":12,},
     "126":{"character":126,"h":8,"offset":0,"shift":5,"w":4,"x":19,"y":42,},
-    "9647":{"character":9647,"h":8,"offset":1,"shift":8,"w":6,"x":25,"y":42,},
+    "9647":{"character":9647,"h":8,"offset":2,"shift":8,"w":4,"x":25,"y":42,},
   },
   "hinting":0,
   "includeTTF":false,

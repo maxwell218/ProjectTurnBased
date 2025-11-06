@@ -1,4 +1,5 @@
 enum Event {
+	
 	// Game
 	GameNew, // Used to initialize the game's world, camera, lifeforms, etc.
 	GameLoad, // Used to determine if we loaded a save

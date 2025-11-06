@@ -12,6 +12,7 @@ function LifeformMember(_lifeform_type, _stats) constructor {
 	#region Methods
 	
 	init = function(_instance, _current_tile) {
+		
 		instance = _instance;
 		update_move_range(_current_tile);
 	}
@@ -69,10 +70,12 @@ function LifeformMember(_lifeform_type, _stats) constructor {
 	}
 	
 	destroy = function() {
+		
 		if (ds_exists(move_range_map, ds_type_map)) ds_map_destroy(move_range_map);	
 	}
 	
 	draw = function(_draw_x, _draw_y) {
+		
 		if (instance != noone) {
 			instance.draw(_draw_x, _draw_y);	
 		}
