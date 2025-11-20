@@ -9,7 +9,8 @@ enum HumanBodyPart {
     LeftUpperLeg,
     LeftLowerLeg,
     RightUpperLeg,
-    RightLowerLeg
+    RightLowerLeg,
+	Last
 }
 
 function HumanStats() constructor {
@@ -17,12 +18,24 @@ function HumanStats() constructor {
 	base = [];
 	
 	// TODO Initialize other base lifeform stats
+	base[LifeformStat.CurrentHealth] = 100;
+	base[LifeformStat.MaxHealth] = 100;
 	base[LifeformStat.MovePoints] = 5;
+	
+	// 2D array of injuries for each body parts
+	body_part_injuries = array_create(HumanBodyPart.Last - 1, []);
 	
 	// Array of structs {source, target, value}
     modifiers = [];
 
     #region Methods
+	
+	// Edge cases:
+	// If we have a severe cut with max severity, we need the health system to transform the injury from cut to deep wound
+	// If we have severe bruising with max severity, we need to create a new fracture injury to the same body part, while keeping all other active injuries
+	add_injury = function(_body_part, _injury) {
+		
+	}
 
     add_modifier = function(_source, _target, _value) {
 		

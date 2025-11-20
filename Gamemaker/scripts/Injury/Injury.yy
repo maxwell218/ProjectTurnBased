@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"HealthSystem",
+  "%Name":"Injury",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"HealthSystem",
+  "name":"Injury",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"Lifeform",
+    "path":"folders/Scripts/Lifeform.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

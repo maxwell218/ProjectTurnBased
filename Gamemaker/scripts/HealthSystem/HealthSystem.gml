@@ -1,3 +1,0 @@
-function HealthSystem() constructor {
-	
-}

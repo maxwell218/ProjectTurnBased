@@ -26,6 +26,7 @@ enum Input {
 	
 	// Mouse
 	Select,
+	Drag,
 	Cancel,
 	
 	// Controls UI and world contexts
@@ -87,43 +88,42 @@ process_input = function(_input_array, _input_press_type_override = undefined) {
 /// @description Handles all current contexts
 handle_input_contexts = function() {
 	
+    // Build state array
 	for (var _i = 0; _i < Input.Last; _i++) {
 		input_states[_i] = process_input(inputs[_i]);
 	}
-	
-	// Reset context hover
+
+    // Tracks which inputs are consumed THIS FRAME
+    var _consumed_inputs = array_create(Input.Last, false);
+
+	// Reset hover
 	global.hover_context = noone;
-	
-	var _context_inputs = ds_map_create();
-	
+
 	// Sort contexts by priority
-    array_sort(contexts, function(_a, _b) { return _a.priority - _b.priority; });
-	
-    // Handle contexts by priority (higher priority last)
-    for (var _i = 0; _i < array_length(contexts); _i++) {
-        
-		var _context = contexts[_i];
+	array_sort(contexts, function(_a, _b) { 
+		return _b.priority - _a.priority; 
+	});
 
-        // Only send inputs that this context cares about
-        ds_map_clear(_context_inputs);
-		
-        var _keys = ds_map_keys_to_array(_context.actions);
-        for (var _k = 0; _k < array_length(_keys); _k++) {
-            var _action = _keys[_k];
-			ds_map_set(_context_inputs, _action, input_states[_action]);
-        }
-		
-		// Check if hover is captured
+	// Process each context
+	var _count = array_length(contexts);
+	for (var _c = 0; _c < _count; _c++) {
+
+		var _context = contexts[_c];
+
+		// Hover logic (first context to claim hover wins)
 		if (global.hover_context == noone && _context.check_hover()) {
-	        global.hover_context = _context;
-	    }
+			global.hover_context = _context;
+		}
 
-        if (_context.handle_input(_context_inputs)) {
-            break; // Consumed, stop lower-priority contexts
-        }
-    }
-	
-	ds_map_destroy(_context_inputs);
+		// Handle input for this context
+		var _consumed = _context.handle_input(input_states, _consumed_inputs);
+
+		// Mark inputs as consumed
+		var _consumed_count = array_length(_consumed);
+		for (var _i = 0; _i < _consumed_count; _i++) {
+			_consumed_inputs[_consumed[_i]] = true;
+		}
+	}
 }
 
 #endregion
@@ -145,6 +145,7 @@ inputs[Input.Down] =	[Device.Keyboard, InputPressType.Held,	 KEY_DOWN];
 inputs[Input.Shift] =	[Device.Keyboard, InputPressType.Held,	 KEY_SHIFT];
 
 inputs[Input.Select] =	[Device.Mouse,	InputPressType.Pressed,	 KEY_SELECT];
+inputs[Input.Drag] =	[Device.Mouse,	InputPressType.Held,	 KEY_SELECT];
 inputs[Input.Cancel] =	[Device.Mouse,	InputPressType.Pressed,	 KEY_CANCEL];
 
 // Array containing the states for the inputs

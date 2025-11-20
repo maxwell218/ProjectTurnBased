@@ -100,6 +100,10 @@ move_group_along_path = function(_lifeform_group) {
 
         /// Remove the tile we just stepped onto
         array_delete(lifeform_group_path, 0, 1);
+		
+		// Configure and start time source for next steps
+		time_source_reconfigure(lifeform_group_movement_timer, lifeform_group_movement_duration, time_source_units_seconds, move_group_along_path, [_lifeform_group], -1);
+		time_source_start(lifeform_group_movement_timer);
     }
 	
 	// TODO Check if we triggered an encounter
@@ -176,10 +180,7 @@ event_manager_subscribe(Event.WorldCellSelected, function(_cell_data) {
 	}
 
 	lifeform_group_path = global.world.get_path(_player_group.current_tile, _cell_data, _player_group.get_min_movement_range());
-	
-	// Configure and start time source	
-	time_source_reconfigure(lifeform_group_movement_timer, lifeform_group_movement_duration, time_source_units_seconds, move_group_along_path, [_player_group], -1);
-	time_source_start(lifeform_group_movement_timer);
+	move_group_along_path(_player_group);
 });
 
 event_manager_subscribe(Event.LifeformGroupDestinationReached, function(_lifeform_group) {

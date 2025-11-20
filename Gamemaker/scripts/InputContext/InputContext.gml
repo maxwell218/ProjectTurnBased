@@ -5,52 +5,94 @@ enum ContextPriority {
 	Last
 }
 
-function InputContext(_owner, _priority, _consume) constructor {
-    owner = _owner;
-    priority = _priority;
-    consume = _consume; // if true, blocks lower layers
+function InputContext(_owner, _priority, _consume_context) constructor {
 
-    // Actions this context cares about
-    actions = ds_map_create();
-	hover_method = undefined;
+    owner           = _owner;
+    priority        = _priority;
+    consume_context = _consume_context; // if true, stops other groups in this context
 
-    add_action = function(_input, _method) {
-		actions[? _input] = _method;
+    hover_method    = undefined;
+
+    // Array instead of ds_map so ordering is guaranteed
+    action_groups    = [];
+
+    /// Add a group: inputs array, action, priority inside this context
+    add_action_group = function(_inputs, _action, _priority, _consume_inputs, _always_run = false) {
+        var _entry = {
+            inputs   : _inputs,
+            action   : _action,
+            priority : _priority,
+			consume_inputs : _consume_inputs,
+			always_run : _always_run
+        };
+        array_push(action_groups, _entry);
     }
-	
-	add_action_group = function(_inputs, _method) {
-		for (var _i = 0; _i < array_length(_inputs); _i++) {
-			add_action(_inputs[_i], _method);
-		}
-	}
-	
-	set_hover_method = function(_method) {
+
+    /// Hover
+    set_hover_method = function(_method) {
         hover_method = _method;
     }
 
     check_hover = function() {
-        if (is_undefined(hover_method)) return false;
-        return hover_method();
+        return is_undefined(hover_method) ? false : hover_method();
     }
 
-    handle_input = function(_input) {
-	    var _handled = false;
-	    var _keys = ds_map_keys_to_array(actions);
+    /// Handle inputs
+    /// Arguments:
+    ///     _input_states     array<bool>
+    ///     _consumed_inputs  array<bool>
+    ///
+    /// Returns:
+    ///     array<int> of inputs consumed in this context frame
+    handle_input = function(_input_states, _consumed_inputs) {
 
-	    for (var _i = 0; _i < array_length(_keys); _i++) {
-	        var _action = _keys[_i];
+        // Sort groups by their action-level priority
+        array_sort(action_groups, function(_a, _b) { 
+            return _b.priority - _a.priority; 
+        });
 
-	        if (_input[? _action]) {
-	            with (owner) {
-	                script_execute(other.actions[? _action], _input);
-	            }
+        var _consumed = [];
 
-	            _handled = true;
-	            break; // STOP after handling the first input
+        // For each action group in this context
+        for (var _i = 0; _i < array_length(action_groups); _i++) {
+
+            var _group = action_groups[_i];
+            var _inputs = _group.inputs;
+
+            var _triggered = false;
+
+            // Check any input in this group
+			var _count = array_length(_inputs);
+            for (var _j = 0; _j < _count; _j++) {
+                var _key = _inputs[_j];
+
+                if (!_consumed_inputs[_key] && _input_states[_key]) {
+                    _triggered = true;
+                    break;
+                }
+            }
+			
+			// If not triggered and not always_run, skip
+	        if (!_triggered && !_group.always_run) {
+	            continue;
 	        }
-	    }
 
-	    // If consumed, returns true
-	    return _handled && consume;
-	}
+            // Call the method EVERY TIME we reach here, with triggered flag
+	        // signature: script_execute(method, _input_states, triggered)
+	        with (owner) script_execute(_group.action, _input_states, _triggered);
+
+	        // Only consume inputs if the group asked to
+	        if (_group.consume_inputs) {
+	            for (var _j = 0; _j < _count; _j++) {
+	                array_push(_consumed, _inputs[_j]);
+	            }
+	        }
+
+            // If this group consumes the whole context, stop
+            if (consume_context)
+                break;
+        }
+
+        return _consumed;
+    }
 }

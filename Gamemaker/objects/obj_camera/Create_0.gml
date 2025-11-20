@@ -5,10 +5,10 @@
 
 #region Methods
 
-move_camera = function(_input) {
+move_camera = function(_inputs) {
 	
-    var _input_x = (_input[? Input.Right] - _input[? Input.Left]);
-    var _input_y = (_input[? Input.Down] - _input[? Input.Up]);
+    var _input_x = (_inputs[Input.Right] - _inputs[Input.Left]);
+    var _input_y = (_inputs[Input.Down] - _inputs[Input.Up]);
 
     var _len = point_distance(0, 0, _input_x, _input_y);
 
@@ -18,7 +18,7 @@ move_camera = function(_input) {
         _input_x /= _len;
         _input_y /= _len;
 		
-		var _mult = (_input[? Input.Shift]) ? speed_mult : 1;
+		var _mult = (_inputs[Input.Shift]) ? speed_mult : 1;
 
         target_x += _input_x * panning_speed * _mult;
         target_y += _input_y * panning_speed * _mult;
@@ -35,7 +35,7 @@ move_camera = function(_input) {
 
 target_x = 0;
 target_y = 0;
-panning_speed = 2.5;
+panning_speed = 3;
 speed_mult = 2;
 
 #endregion
@@ -43,7 +43,7 @@ speed_mult = 2;
 #region Context
 
 context = new InputContext(self, ContextPriority.World, true);
-context.add_action_group([Input.Up, Input.Down, Input.Left, Input.Right, Input.Shift], move_camera);
+context.add_action_group([Input.Up, Input.Down, Input.Left, Input.Right, Input.Shift], move_camera, 0);
 
 #endregion
 

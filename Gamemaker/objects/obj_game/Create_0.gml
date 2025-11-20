@@ -1,4 +1,12 @@
 /// @description Create all game components
+enum DepthTable {
+	Cursor,
+	Menu,
+	UI,
+	World,
+}
+
+
 global.debug = true;
 global.event_manager = new EventManager();
 
@@ -6,6 +14,7 @@ global.event_manager = new EventManager();
 var _cam_width = camera_get_view_width(view_camera[0]);
 var _cam_height = camera_get_view_height(view_camera[0]);
 display_set_gui_size(_cam_width, _cam_height);
+draw_set_font(fnt_04b03);
 
 window_set_min_width(640);
 window_set_min_height(360);
@@ -24,6 +33,6 @@ room_set_width(rm_world, HEX_WIDTH * WORLD_WIDTH * 3/4);
 room_set_height(rm_world, HEX_HEIGHT * WORLD_HEIGHT);
 
 // TODO Add proper main menu
-room_goto(rm_health_system);
+room_goto(rm_health_ui);
 // room_goto(rm_inventory);
 // room_goto(rm_world);

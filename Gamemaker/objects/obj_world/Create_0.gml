@@ -348,11 +348,16 @@ get_hovered_tile = function() {
 	hovered_hex = collision_point(mouse_x, mouse_y, obj_hex_tile, true, false);
 }
 
-on_hex_click = function(_input) {
+on_hex_click = function(_inputs) {
 	
-	// TODO Send ui button as well (Scout, Run, etc.)
-	if (hovered_hex != noone) {
+	// TODO Send ui button state as well (Scout, Run, etc.)
+	if (_inputs[Input.Select] && hovered_hex != noone) {
+		
 		event_manager_publish(Event.WorldCellSelected, hovered_hex.cell_data);
+	}
+	
+	if (_inputs[Input.Up]) {
+		show_debug_message("test");	
 	}
 }
 
@@ -415,7 +420,7 @@ anchor_col = 0;
 #region Context
 
 context = new InputContext(self, ContextPriority.World, true);
-context.add_action(Input.Select, on_hex_click);
+context.add_action_group([Input.Select], on_hex_click, 0, true);
 context.set_hover_method(get_hovered_tile);
 
 #endregion
@@ -425,7 +430,6 @@ context.set_hover_method(get_hovered_tile);
 event_manager_subscribe(Event.GameNew, function() {
 	
 	// TODO Initialise factions
-	
 	
 	// Initialise spawns
 	array_push(lifeform_spawns, new StaticSpawn(2, 5));
