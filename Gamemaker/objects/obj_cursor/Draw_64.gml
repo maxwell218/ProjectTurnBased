@@ -13,8 +13,10 @@ if (global.debug) {
 
 	draw_text(_x, _y, "Cursor x: " + string(x));
 	draw_text(_x, _y + 8, "Cursor y: " + string(y));
-	draw_text(_x, _y + 16, "Gui x: " + string(gui_y));
+	draw_text(_x, _y + 16, "Gui x: " + string(gui_x));
 	draw_text(_x, _y + 24, "Gui y: " + string(gui_y));
+	draw_text(_x, _y + 32, "Camera x: " + string(camera_get_view_x(view_camera[0])));
+	draw_text(_x, _y + 40, "Camera y: " + string(camera_get_view_y(view_camera[0])));
 }
 
 // Draw the cursor

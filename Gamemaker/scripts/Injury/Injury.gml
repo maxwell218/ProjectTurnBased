@@ -23,7 +23,7 @@ enum InjuryAttribute {
 function Injury(_type, _state, _severity) constructor {
 	
 	type = _type;
-	base = array_create(InjuryAttribute.Last - 1, undefined);
+	base = array_create(InjuryAttribute.Last, undefined);
 	
 	// Set initial attributes
 	base[InjuryAttribute.State] = _state;

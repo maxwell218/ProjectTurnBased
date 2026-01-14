@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"UIChild",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"UIChild",
+  "parent":{
+    "name":"UI",
+    "path":"folders/Scripts/UI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

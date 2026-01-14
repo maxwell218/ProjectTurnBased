@@ -1,10 +1,10 @@
 if (global.debug) {
 	
-	draw_set_valign(fa_middle);
-	draw_set_halign(fa_center);
+	draw_set_valign(fa_left);
+	draw_set_halign(fa_top);
 
-	var _x = x + HEX_WIDTH div 2 - camera_get_view_x(view_camera[0]);
-	var _y = y + HEX_HEIGHT div 2 - camera_get_view_y(view_camera[0]);
+	var _x = x + HEX_WIDTH * (1/4) - camera_get_view_x(view_camera[0]);
+	var _y = y + HEX_HEIGHT / 2 - camera_get_view_y(view_camera[0]) - 8;
 
 	//// Show tile coords
 	draw_text_transformed(_x, _y, 

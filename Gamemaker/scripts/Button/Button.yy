@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"InputContext",
+  "%Name":"Button",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"InputContext",
+  "name":"Button",
   "parent":{
-    "name":"Input",
-    "path":"folders/Scripts/Input.yy",
+    "name":"Element",
+    "path":"folders/Scripts/UI/Element.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

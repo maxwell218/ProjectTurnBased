@@ -23,7 +23,7 @@ function HumanStats() constructor {
 	base[LifeformStat.MovePoints] = 5;
 	
 	// 2D array of injuries for each body parts
-	body_part_injuries = array_create(HumanBodyPart.Last - 1, []);
+	body_part_injuries = array_create(HumanBodyPart.Last, []);
 	
 	// Array of structs {source, target, value}
     modifiers = [];

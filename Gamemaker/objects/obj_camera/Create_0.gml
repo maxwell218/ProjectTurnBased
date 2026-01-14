@@ -5,24 +5,52 @@
 
 #region Methods
 
-move_camera = function(_inputs) {
+move_camera = function() {
 	
-    var _input_x = (_inputs[Input.Right] - _inputs[Input.Left]);
-    var _input_y = (_inputs[Input.Down] - _inputs[Input.Up]);
-
-    var _len = point_distance(0, 0, _input_x, _input_y);
-
-    if (_len > 0) {
+	var _drag_pressed = process_input(Input.Cancel, InputPressType.Pressed);
+	var _drag_held = process_input(Input.Cancel, InputPressType.Held);
+	
+	if (!_drag_held) {
 		
-        // Normalize to ensure consistent movement speed in diagonals
-        _input_x /= _len;
-        _input_y /= _len;
-		
-		var _mult = (_inputs[Input.Shift]) ? speed_mult : 1;
+		// Move camera with keyboard
+		var _right = process_input(Input.Right, InputPressType.Held);
+		var _left = process_input(Input.Left, InputPressType.Held);
+		var _up = process_input(Input.Up, InputPressType.Held);
+		var _down = process_input(Input.Down, InputPressType.Held);
+		var _shift = process_input(Input.Shift, InputPressType.Held);
+	
+	    var _input_x = (_right - _left);
+	    var _input_y = (_down - _up);
 
-        target_x += _input_x * panning_speed * _mult;
-        target_y += _input_y * panning_speed * _mult;
-    }
+	    var _len = point_distance(0, 0, _input_x, _input_y);
+
+	    if (_len > 0) {
+		
+	        // Normalize to ensure consistent movement speed in diagonals
+	        _input_x /= _len;
+	        _input_y /= _len;
+		
+			var _mult = (_shift) ? speed_mult : 1;
+
+	        target_x += _input_x * panning_speed * _mult;
+	        target_y += _input_y * panning_speed * _mult;
+		}
+	} else {
+		
+		// Drag the camera using the mouse
+		if (_drag_pressed) {
+			
+			with (obj_cursor) {
+				other.drag_anchor_x = x;
+				other.drag_anchor_y = y;
+			}
+		}
+		
+		with (obj_cursor) {
+			other.target_x = other.drag_anchor_x - gui_x;
+			other.target_y = other.drag_anchor_y - gui_y;
+		}
+	}
 
     // Clamp camera to boundaries
     target_x = clamp(target_x, -HORIZONTAL_MARGIN, (room_width - camera_get_view_width(view_camera[0])) + HORIZONTAL_MARGIN);
@@ -33,22 +61,11 @@ move_camera = function(_inputs) {
 
 #region Variables
 
+drag_anchor_x = 0;
+drag_anchor_y = 0;
 target_x = 0;
 target_y = 0;
 panning_speed = 3;
 speed_mult = 2;
-
-#endregion
-
-#region Context
-
-context = new InputContext(self, ContextPriority.World, true);
-context.add_action_group([Input.Up, Input.Down, Input.Left, Input.Right, Input.Shift], move_camera, 0);
-
-#endregion
-
-#region Events
-
-event_manager_publish(Event.AddContext, context);
 
 #endregion

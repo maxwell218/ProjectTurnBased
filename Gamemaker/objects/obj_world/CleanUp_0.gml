@@ -1,5 +1,2 @@
-/// @description Clean up context, ds map
-
-// TODO Publish context removal
-
+/// @description Clean up ds map
 ds_map_destroy(lifeform_group_positions);

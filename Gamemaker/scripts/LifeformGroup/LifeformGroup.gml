@@ -8,37 +8,12 @@
 
 function LifeformGroup(_members, _leader, _faction, _id = undefined) constructor {
 	
-    // Static variables (shared between all LifeformGroup instances)
-    static next_id = 1;
-    static free_ids = []; // Reusable IDs
-
-    // Assign ID
-	if (_id != undefined) {
-		group_id = _id;
-	} else {
-	    if (array_length(free_ids) > 0) {
-	        group_id = array_pop(free_ids); // Take first free ID
-	    } else {
-	        group_id = next_id;
-	        next_id += 1;
-	    }
-	}
-
-    // Assign other properties
-    members = _members;
-    leader  = _leader;
-    faction = _faction;
-	
-	// Reference of the cell on which the lifeform is currently on
-	current_tile = undefined;
-	
 	#region Methods
 	
 	init = function(_world_cell) {
 		
 		current_tile = _world_cell;
 		
-		// --- Create the lifeform instances ---
 		var _member_count = array_length(members);
 		for (var _i = 0; _i < _member_count; _i++) {
 			
@@ -214,6 +189,34 @@ function LifeformGroup(_members, _leader, _faction, _id = undefined) constructor
 			}
 		}
 	}
+	
+	#endregion
+	
+	#region Variables
+	
+	// Static variables (shared between all LifeformGroup instances)
+    static next_id = 1;
+    static free_ids = []; // Reusable IDs
+
+    // Assign ID
+	if (_id != undefined) {
+		group_id = _id;
+	} else {
+	    if (array_length(free_ids) > 0) {
+	        group_id = array_pop(free_ids); // Take first free ID
+	    } else {
+	        group_id = next_id;
+	        next_id += 1;
+	    }
+	}
+
+    // Assign other properties
+    members = _members;
+    leader  = _leader;
+    faction = _faction;
+	
+	// Reference of the cell on which the lifeform is currently on
+	current_tile = undefined;
 	
 	#endregion
 }

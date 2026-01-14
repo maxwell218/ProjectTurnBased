@@ -1,6 +1,6 @@
 /// @description Create all world components
-#macro WORLD_HEIGHT 20
-#macro WORLD_WIDTH 20
+#macro WORLD_HEIGHT 50
+#macro WORLD_WIDTH 50
 
 #macro HEX_HEIGHT sprite_get_height(spr_hex_tile)
 #macro HEX_WIDTH sprite_get_width(spr_hex_tile)
@@ -164,66 +164,81 @@ init_pool_for_camera = function() {
 }
 
 reposition_pool = function() {
-	
     // --- Camera -> new anchor
     var _cam_x = camera_get_view_x(view_camera[0]);
     var _cam_y = camera_get_view_y(view_camera[0]);
     var _new_anchor = pixel_to_hex_grid(_cam_x, _cam_y);
     var _new_anchor_row = clamp(_new_anchor[0] - 1, 0, max(0, WORLD_HEIGHT - pool_rows));
     var _new_anchor_col = clamp(_new_anchor[1] - 1, 0, max(0, WORLD_WIDTH - pool_cols));
-
+    
+    // Early exit if anchor hasn't changed
     if (_new_anchor_row == anchor_row && _new_anchor_col == anchor_col) return;
-
+    
     // --- Bounds
     var _old_r0 = anchor_row, _old_c0 = anchor_col;
     var _new_r0 = _new_anchor_row, _new_c0 = _new_anchor_col;
     var _old_r1 = _old_r0 + pool_rows - 1, _old_c1 = _old_c0 + pool_cols - 1;
     var _new_r1 = _new_r0 + pool_rows - 1, _new_c1 = _new_c0 + pool_cols - 1;
-
+    
     // --- Overlap region
     var _ov_r0 = max(_old_r0, _new_r0), _ov_c0 = max(_old_c0, _new_c0);
     var _ov_r1 = min(_old_r1, _new_r1), _ov_c1 = min(_old_c1, _new_c1);
     var _has_overlap = (_ov_r1 >= _ov_r0) && (_ov_c1 >= _ov_c0);
-
-    // --- Collect recyclable instances
+    
+    // --- Collect recyclable instances (pre-allocate array size if possible)
     var _recyclables = [];
+    var _recycle_count = 0;
+    
     for (var _i = 0; _i < pool_rows; _i++) {
-        for (var _j = 0; _j < pool_cols; _j++) {
-            var _r = _old_r0 + _i, _c = _old_c0 + _j;
-            if (_r < _new_r0 || _r > _new_r1 || _c < _new_c0 || _c > _new_c1) {
-                array_push(_recyclables, pool[_i][_j]);
+        var _r = _old_r0 + _i;
+        // Skip entire rows that are in overlap range
+        if (_has_overlap && _r >= _ov_r0 && _r <= _ov_r1) {
+            for (var _j = 0; _j < pool_cols; _j++) {
+                var _c = _old_c0 + _j;
+                if (_c < _ov_c0 || _c > _ov_c1) {
+                    _recyclables[_recycle_count++] = pool[_i][_j];
+                }
+            }
+        } else {
+            // Entire row is outside overlap - recycle all
+            for (var _j = 0; _j < pool_cols; _j++) {
+                _recyclables[_recycle_count++] = pool[_i][_j];
             }
         }
     }
-
-    // --- Create new pool
+    
+    // --- Create new pool (unavoidable allocation)
     var _new_pool = array_create(pool_rows);
-    for (var _i = 0; _i < pool_rows; _i++) _new_pool[_i] = array_create(pool_cols);
+    for (var _i = 0; _i < pool_rows; _i++) {
+        _new_pool[_i] = array_create(pool_cols);
+    }
+    
     var _recycle_i = 0;
-
+    
     // --- Fill new pool
     for (var _i = 0; _i < pool_rows; _i++) {
+        var _wr = _new_r0 + _i;
+        
         for (var _j = 0; _j < pool_cols; _j++) {
-            var _wr = _new_r0 + _i, _wc = _new_c0 + _j;
-
+            var _wc = _new_c0 + _j;
+            
             // Reuse overlapping instance if inside both old and new regions
             if (_has_overlap && _wr >= _ov_r0 && _wr <= _ov_r1 && _wc >= _ov_c0 && _wc <= _ov_c1) {
-                var _old_i = _wr - _old_r0, _old_j = _wc - _old_c0;
+                var _old_i = _wr - _old_r0;
+                var _old_j = _wc - _old_c0;
                 _new_pool[_i][_j] = pool[_old_i][_old_j];
-                continue;
+            } else {
+                // Recycle an old instance
+                var _inst = _recyclables[_recycle_i++];
+                var _xy = hex_grid_to_pixel(_wr, _wc);
+                _inst.x = _xy[0];
+                _inst.y = _xy[1];
+                _inst.cell_data = get_world_data(_wr, _wc);
+                _new_pool[_i][_j] = _inst;
             }
-
-            // Otherwise recycle an old instance
-            var _inst = _recyclables[_recycle_i++];
-            var _xy = hex_grid_to_pixel(_wr, _wc);
-            _inst.x = _xy[0];
-            _inst.y = _xy[1];
-			_inst.cell_data = get_world_data(_wr, _wc);
-
-            _new_pool[_i][_j] = _inst;
         }
     }
-
+    
     pool = _new_pool;
     anchor_row = _new_anchor_row;
     anchor_col = _new_anchor_col;
@@ -345,19 +360,20 @@ move_lifeform_group = function(_lifeform_group, _next_tile) {
 
 get_hovered_tile = function() {
 	
-	hovered_hex = collision_point(mouse_x, mouse_y, obj_hex_tile, true, false);
+	with (obj_cursor) { 
+		other.hovered_hex = collision_point(x, y, obj_hex_tile, true, false);
+	}
+	return hovered_hex != noone;
 }
 
-on_hex_click = function(_inputs) {
+on_hex_click = function() {
+	
+	var _click = process_input(Input.Select, InputPressType.Pressed);
 	
 	// TODO Send ui button state as well (Scout, Run, etc.)
-	if (_inputs[Input.Select] && hovered_hex != noone) {
+	if (_click && hovered_hex != noone) {
 		
 		event_manager_publish(Event.WorldCellSelected, hovered_hex.cell_data);
-	}
-	
-	if (_inputs[Input.Up]) {
-		show_debug_message("test");	
 	}
 }
 
@@ -378,7 +394,64 @@ draw_tiles_in_view = function() {
         if (a.y == b.y) return a.x - b.x;
         return a.y - b.y;
     });
+	
+	/*
+	
+	vertex_format_begin();
+	vertex_format_add_position();
+	vertex_format_add_color();
+	vertex_format_add_texcoord();
+	var _vertex_format = vertex_format_end();
+	
+	var _vertex = vertex_create_buffer();
+	vertex_begin(_vertex, _vertex_format);
+	
+	var _tile_count = array_length(_tiles_to_draw);
+	for (var _i = 0; _i < _tile_count; _i++) {
+		
+        var _tile = _tiles_to_draw[_i];
+        var _tex = _tile.cell_data[CellData.Terrain];
 
+        var _w = sprite_get_width(_tex);
+        var _h = sprite_get_height(_tex);
+		
+        var _x0 = _tile.x;
+        var _y0 = _tile.y;
+        var _x1 = _x0 + _w;
+        var _y1 = _y0 + _h;
+
+        // First triangle
+        vertex_position(_vertex, _x0, _y0);
+        vertex_colour(_vertex, c_white, 1);
+        vertex_texcoord(_vertex, 0, 0);
+
+        vertex_position(_vertex, _x1, _y0);
+        vertex_colour(_vertex, c_white, 1);
+        vertex_texcoord(_vertex, 1, 0);
+
+        vertex_position(_vertex, _x1, _y1);
+        vertex_colour(_vertex, c_white, 1);
+        vertex_texcoord(_vertex, 1, 1);
+
+        // Second triangle
+        vertex_position(_vertex, _x0, _y0);
+        vertex_colour(_vertex, c_white, 1);
+        vertex_texcoord(_vertex, 0, 0);
+
+        vertex_position(_vertex, _x1, _y1);
+        vertex_colour(_vertex, c_white, 1);
+        vertex_texcoord(_vertex, 1, 1);
+
+        vertex_position(_vertex, _x0, _y1);
+        vertex_colour(_vertex, c_white, 1);
+        vertex_texcoord(_vertex, 0, 1);
+    }
+	
+	vertex_delete_buffer(_vertex);
+	vertex_format_delete(_vertex_format);
+
+	*/
+	
     // Draw them in sorted order
     for (var i = 0; i < array_length(_tiles_to_draw); i++) {
         var _tile = _tiles_to_draw[i];
@@ -414,14 +487,6 @@ pool_rows = 0;
 pool_cols = 0;
 anchor_row = 0;
 anchor_col = 0;
-
-#endregion
-
-#region Context
-
-context = new InputContext(self, ContextPriority.World, true);
-context.add_action_group([Input.Select], on_hex_click, 0, true);
-context.set_hover_method(get_hovered_tile);
 
 #endregion
 
@@ -461,7 +526,5 @@ event_manager_subscribe(Event.LifeformGroupCreated, function(_lifeform_group) {
 	_lifeform_group.init(_world_cell);
 	ds_map_add(lifeform_group_positions, _lifeform_group.group_id, _world_cell);
 });
-
-event_manager_publish(Event.AddContext, context);
 
 #endregion

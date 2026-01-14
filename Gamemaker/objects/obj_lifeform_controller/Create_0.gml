@@ -3,7 +3,7 @@
 enum TurnOrder {
 	Player,
 	Ai,
-	Last,
+	Last
 }
 
 enum LifeformType {
@@ -87,6 +87,15 @@ is_movement_active = function() {
 
 move_group_along_path = function(_lifeform_group) {
 	
+	// Stop the time source if we've reached the end of the path / reached an encounter
+	if (array_length(lifeform_group_path) <= 0) {
+		
+		time_source_stop(lifeform_group_movement_timer);
+		time_source_reset(lifeform_group_movement_timer);
+		
+		event_manager_publish(Event.LifeformGroupDestinationReached, _lifeform_group);
+	}
+	
 	// If we still have a tile to move towards
     if (array_length(lifeform_group_path) > 0) {
 		
@@ -107,15 +116,6 @@ move_group_along_path = function(_lifeform_group) {
     }
 	
 	// TODO Check if we triggered an encounter
-	
-	// Stop the time source if we've reached the end of the path / reached an encounter
-	if (array_length(lifeform_group_path) <= 0) {
-		
-		time_source_stop(lifeform_group_movement_timer);
-		time_source_reset(lifeform_group_movement_timer);
-		
-		event_manager_publish(Event.LifeformGroupDestinationReached, _lifeform_group);
-	}
 }
 
 #endregion
@@ -129,7 +129,7 @@ current_turn = TurnOrder.Player;
 lifeform_groups = ds_map_create();
 
 // Used to move lifeform groups one tile at a time
-lifeform_group_movement_duration = 0.35 // Duration for each step in seconds
+lifeform_group_movement_duration = 0.4 // Duration for each step in seconds
 lifeform_group_movement_timer = time_source_create(time_source_game, lifeform_group_movement_duration, time_source_units_seconds, move_group_along_path, [], -1);
 
 // Keeps track of the path a lifeform group should follow
@@ -164,7 +164,7 @@ event_manager_subscribe(Event.TurnEnd, function() {
 });
 
 event_manager_subscribe(Event.WorldCellSelected, function(_cell_data) {
-	
+
 	// Check if we are already moving a group
 	if (is_movement_active()) {
 		return;	
