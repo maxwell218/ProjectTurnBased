@@ -14,7 +14,8 @@ enum InputArray {
 enum InputPressType {
 	Pressed,
 	Held,
-	Released
+	Released,
+	Scroll
 }
 
 enum Input {
@@ -27,6 +28,7 @@ enum Input {
 	// Mouse
 	Select,
 	Cancel,
+	Scroll,
 	
 	// Controls UI and world contexts
 	Up,
@@ -52,7 +54,8 @@ global.inputs[Input.Up] =		[DeviceType.Keyboard, KEY_UP];
 global.inputs[Input.Down] =		[DeviceType.Keyboard, KEY_DOWN];
 global.inputs[Input.Shift] =	[DeviceType.Keyboard, KEY_SHIFT];
 
-global.inputs[Input.Select] =	[DeviceType.Mouse, KEY_SELECT];
-global.inputs[Input.Cancel] =	[DeviceType.Mouse, KEY_CANCEL];
+global.inputs[Input.Select] =		[DeviceType.Mouse, KEY_SELECT];
+global.inputs[Input.Cancel] =		[DeviceType.Mouse, KEY_CANCEL];
+global.inputs[Input.Scroll] =		[DeviceType.Mouse, KEY_NONE];
 
 #endregion

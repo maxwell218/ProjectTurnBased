@@ -11,10 +11,10 @@ if (global.debug) {
 	var _x = _cam_width;
 	var _y = 0;
 
-	draw_text(_x, _y, "Cursor x: " + string(x));
-	draw_text(_x, _y + 8, "Cursor y: " + string(y));
-	draw_text(_x, _y + 16, "Gui x: " + string(gui_x));
-	draw_text(_x, _y + 24, "Gui y: " + string(gui_y));
+	draw_text(_x, _y, "Cursor x: " + string(round(x)));
+	draw_text(_x, _y + 8, "Cursor y: " + string(round(y)));
+	draw_text(_x, _y + 16, "Gui x: " + string(round(gui_x)));
+	draw_text(_x, _y + 24, "Gui y: " + string(round(gui_y)));
 	draw_text(_x, _y + 32, "Camera x: " + string(camera_get_view_x(view_camera[0])));
 	draw_text(_x, _y + 40, "Camera y: " + string(camera_get_view_y(view_camera[0])));
 }

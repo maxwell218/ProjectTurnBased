@@ -23,6 +23,8 @@ function check_mouse_input(_mouse_input, _press_type) {
 			return mouse_check_button(_mouse_input);
 		case InputPressType.Released:
 			return mouse_check_button_released(_mouse_input);
+		case InputPressType.Scroll:
+			return (mouse_wheel_up() - mouse_wheel_down() != 0);
 	}
 }
 

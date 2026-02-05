@@ -11,8 +11,8 @@
   "name":"obj_health_ui",
   "overriddenProperties":[],
   "parent":{
-    "name":"UI",
-    "path":"folders/Objects/UI.yy",
+    "name":"TEST",
+    "path":"folders/Objects/TEST.yy",
   },
   "parentObjectId":null,
   "persistent":false,

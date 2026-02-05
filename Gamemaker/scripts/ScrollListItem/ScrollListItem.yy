@@ -6,7 +6,7 @@
   "name":"ScrollListItem",
   "parent":{
     "name":"ScrollList",
-    "path":"folders/Scripts/UI/ScrollList.yy",
+    "path":"folders/Scripts/UI/Element/ScrollList.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

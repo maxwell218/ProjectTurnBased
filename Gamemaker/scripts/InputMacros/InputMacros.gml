@@ -1,4 +1,5 @@
 /// Macros of default keybindings for mouse and keyboard
+#macro KEY_NONE					undefined
 #macro KEY_UP					ord("W")
 #macro KEY_DOWN					ord("S")
 #macro KEY_LEFT					ord("A")

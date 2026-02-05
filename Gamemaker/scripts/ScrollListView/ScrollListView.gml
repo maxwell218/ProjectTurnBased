@@ -1,4 +1,15 @@
-function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
+enum ScrollListPart {
+	Thumb,
+	Scrollbar
+}
+
+function ScrollListView(_x, _y, _width, _height, _children) : UIParent(_x, _y, _width, _height) constructor {
+	
+	#region Inherited Methods
+	
+	collect_hover_inherited = method(self, collect_hover);
+	
+	#endregion
 	
 	#region Methods
 	
@@ -31,7 +42,7 @@ function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
 		
 		// On scroll bar click, allow scrolling
 		if (scrollbar_selected) {
-			var _local_y = mouse_y - y; // Convert from global → local space
+			var _local_y = obj_cursor.gui_y - y; // Convert from global → local space
 
 			var _thumb_height = get_thumb_height();
 			var _track_height = height - _thumb_height;
@@ -41,16 +52,6 @@ function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
 
 			// Convert local thumb position into scroll value
 			scroll_target = _local_y / _track_height * (content_height - height);
-		}
-		
-		// Handle mouse wheel scroll
-		else if (hovered) {
-			
-			// Get mouse wheel input
-		    var _mw = mouse_wheel_up() - mouse_wheel_down();
-		    if (_mw != 0) {
-		        scroll_target -= _mw * scroll_speed;
-			}
 		}
 		
 		// Clamp target
@@ -82,13 +83,6 @@ function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
 		// Get items within visible region
 	    while (_i < _count) {
 	        var _item = children[_i];
-			
-			_item.hovered = false;
-			
-			// Check if item in view is hovered
-			if (hovered) {
-			    _item.is_hover(x, y, scroll);
-			}
 
 	        // Stop when item is below view
 	        if (_item.y > _bottom_view)
@@ -100,23 +94,30 @@ function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
 		child_draw_amount = _i - child_draw_start;
     }
 	
-	on_click = function(_states) {
+	on_primary_action_pressed = function() {
+
+		if (pseudo_elements[ScrollListPart.Thumb].is_hovered || pseudo_elements[ScrollListPart.Scrollbar].is_hovered) {
+			scrollbar_selected = true;	
+		}
+	}
+	
+	on_primary_action_released = function() {
 		
-		show_debug_message("test");
-			
-		// Handle scrollbar selection / deselection
-		if (_states[$ Input.Select].pressed && (is_hover_thumb() || is_hover_scrollbar())) {
-			scrollbar_selected = true;
-		} 	
+		if (scrollbar_selected) {
+			scrollbar_selected = false;	
+		}
+	}
+	
+	on_scroll = function() {
 		
-		if (scrollbar_selected && _states[$ Input.Select].released) {
-			scrollbar_selected = false;
+		var _mw = mouse_wheel_up() - mouse_wheel_down();
+		
+		if (!scrollbar_selected && is_hovered) {
+			scroll_target -= _mw * scroll_speed;
 		}
 	}
 	
 	cleanup = function() {
-		// TODO
-		// Context removal
 		
 		// Surface free
 		surface_free(surface);
@@ -193,7 +194,8 @@ function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
 			draw_set_color(c_olive);
 			draw_rectangle(_sx, 0, width, height, false);
 			
-			if (scrollbar_selected || is_hover_thumb()) {
+			// Check hover or selected state
+			if (scrollbar_selected || pseudo_elements[ScrollListPart.Thumb].is_hovered) {
 				draw_set_color(c_white);
 			} else {
 				draw_set_color(scrollbar_color);
@@ -227,25 +229,36 @@ function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
 		var _scroll_area = height - scrollbar_margin * 2;
 		return max(round(_scroll_area * _view_ratio), scrollbar_thumb_min);
 	}
-	
-	is_hover = function() {
 		
-		hovered = false;
+	collect_hover = function(_mouse_x, _mouse_y, _hovered_stack) {
 		
-		if (point_in_rectangle(mouse_x, mouse_y, x, y, x + width, y + height)) {
-			hovered = true;
+		// Check thumb
+		if (is_hover_thumb(_mouse_x, _mouse_y)) {
+			array_push(_hovered_stack, pseudo_elements[ScrollListPart.Thumb]);
 		}
 		
-		return hovered;
+		// Check scrollbar
+		if (is_hover_scrollbar(_mouse_x, _mouse_y)) {
+			array_push(_hovered_stack, pseudo_elements[ScrollListPart.Scrollbar]);
+		}
+		
+		// Check content
+		var _context = {
+		    scroll_y: scroll,
+		    surface_x: x,
+		    surface_y: y
+		}
+		
+		return collect_hover_inherited(_mouse_x, _mouse_y, _hovered_stack, _context);
 	}
 	
-	is_hover_scrollbar = function() {
+	is_hover_scrollbar = function(_mouse_x, _mouse_y) {
 
 	    if (content_height <= height)
 	        return false; // Scrollbar not visible
 
-	    var _mx = mouse_x - x;
-	    var _my = mouse_y - y;
+	    var _mx = _mouse_x - x;
+	    var _my = _mouse_y - y;
 
 	    var _sb_x  = width - scrollbar_width;
 	    var _sb_x2 = _sb_x + scrollbar_width;
@@ -253,13 +266,13 @@ function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
 	    return (_mx >= _sb_x && _mx <= _sb_x2 && _my >= 0 && _my <= height);
 	}
 
-	is_hover_thumb = function() {
+	is_hover_thumb = function(_mouse_x, _mouse_y) {
 
 	    if (content_height <= height)
 	        return false; // Scrollbar not visible
 
-	    var _mx = mouse_x - x;
-	    var _my = mouse_y - y;
+	    var _mx = _mouse_x - x;
+	    var _my = _mouse_y - y;
 
 	    // Scrollbar X bounds
 	    var _sb_x  = width - scrollbar_width + scrollbar_margin;
@@ -280,13 +293,8 @@ function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
 	#endregion
 	
 	#region Variables
-	
-	x = _x_pos;
-	y = _y_pos;
-	width = _width;
-	height = _height;
 
-	children = _data;
+	children = _children;
 	child_draw_start = 0;
 	child_draw_amount = 0;
 	
@@ -309,11 +317,14 @@ function ScrollListView(_x_pos, _y_pos, _width, _height, _data) constructor {
 	scrollbar_thumb_min = 20;
 	scrollbar_selected = false;
 	
+	// Pseudo UI elements
+	var _owner = self;
+	pseudo_elements = array_create(2, undefined);
+	pseudo_elements[ScrollListPart.Thumb]		= { name: "Thumb", owner: _owner, is_hovered: false };
+	pseudo_elements[ScrollListPart.Scrollbar]	= { name: "Scrollbar", owner: _owner, is_hovered: false };
+	
 	surface = -1;
 	content_height = 0;
-	
-	hovered = true;
-	hovered_item = undefined;
 	
 	#endregion
 	

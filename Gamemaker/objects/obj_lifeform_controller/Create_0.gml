@@ -39,6 +39,9 @@ enum LifeformStat {
 	// Movement
 	MovePoints,
 	
+	// Tile vision range
+	VisionRange,
+	
 	Last	
 }
 

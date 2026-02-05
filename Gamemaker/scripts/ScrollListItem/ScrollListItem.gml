@@ -1,19 +1,14 @@
-function ScrollListItem(_width, _height, _item) constructor {
+function ScrollListItem(_width, _height, _item) : UIChild(0, 0, _width, _height) constructor {
 	
 	#region Methods
 	
-	is_hover = function(_surface_x, _surface_y, _scroll_y) {
+	collect_hover = function(_mouse_x, _mouse_y, _hovered_stack, _context) {
 		
-		hovered = false;
+		var _y = y - _context.scroll_y;
 		
-		var _y = y - _scroll_y;
-		
-		if (point_in_rectangle(mouse_x - _surface_x, mouse_y - _surface_y, x, _y, x + width, _y + height)) {
-			hovered = true;	
+		if (point_in_rectangle(_mouse_x - _context.surface_x, _mouse_y - _context.surface_y, x, _y, x + width, _y + height)) {
+			array_push(_hovered_stack, self);	
 		}
-		
-		
-		return hovered;
 	}
 	
 	draw = function(_scroll_y) {
@@ -25,7 +20,7 @@ function ScrollListItem(_width, _height, _item) constructor {
 		
 		draw_set_color(c_white);
 		
-		if (hovered) {
+		if (is_hovered && global.ui_manager.active_element == undefined) {
 			draw_rectangle(x + 1, _y + 1, x + width - 1, _y + height - 1, true);
 		}
 		
@@ -39,18 +34,7 @@ function ScrollListItem(_width, _height, _item) constructor {
 	
 	#region Variables
 	
-	// How tall it is
-	// How to draw itself
-	// How to handle mouse interactions
-	// How to update its own layout when its data changes
-	
-	x = 0;
-	y = 0;
-	width = _width;
-	height = _height;
-	
 	item = _item;
-	hovered = false;
 	
 	#endregion
 }
