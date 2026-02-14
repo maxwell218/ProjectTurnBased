@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"InventoryContainer",
+  "%Name":"EquipmentComponent",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"InventoryContainer",
+  "name":"EquipmentComponent",
   "parent":{
-    "name":"Inventory",
-    "path":"folders/Scripts/Inventory.yy",
+    "name":"Component",
+    "path":"folders/Scripts/Inventory/Component.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

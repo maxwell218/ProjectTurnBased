@@ -85,16 +85,10 @@ function UIManager() constructor {
 					// Get the function reference inside our caller reference
 					var _caller_func = variable_struct_get(_caller, _action.func);
 					
-					// Bind the resolved function to the caller so `self` is correct at call time
+					// Bind the resolved function to the caller
 					var _ref = method(_caller, _caller_func);
 					
 					method_call(_ref);
-					
-					if (_action.press == InputPressType.Pressed) {
-						active_element = _caller;	
-					} else if (_action.press == InputPressType.Released) {
-						active_element = undefined;	
-					}
 					
 					return true;
 				}
@@ -185,6 +179,14 @@ function UIManager() constructor {
 		
 		event_manager_publish(Event.RemoveUIRoot, _ui_root);
 		event_manager_publish(Event.AddUIRoot, _ui_root);
+	});
+	
+	event_manager_subscribe(Event.CaptureActiveElement, function(_element) {
+		active_element = _element;
+	});
+	
+	event_manager_subscribe(Event.UnsetActiveElement, function() {
+		active_element = undefined;
 	});
 	
 	#endregion

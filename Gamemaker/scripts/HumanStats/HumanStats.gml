@@ -13,6 +13,20 @@ enum HumanBodyPart {
 	Last
 }
 
+enum HumanEquipmentSlot {
+	Head,
+	Eye,
+	Face,
+	TorsoArmor,
+    TorsoInner,
+    TorsoOuter,
+	Back,
+	Legs,
+	RightFoot,
+	LeftFoot,
+	Last
+}
+
 function HumanStats() constructor {
 	
 	base = [];

@@ -2,7 +2,7 @@
 if (room == rm_game) {
 	
 	// Create camera object
-	global.camera = instance_create_layer(x, y, "UI", obj_camera);
+	global.camera = instance_create_layer(x, y, "Controllers", obj_camera);
 	
 	// Create world object
 	global.world = instance_create_layer(x, y, "Controllers", obj_world);

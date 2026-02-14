@@ -2,7 +2,7 @@ function Button(_x, _y, _width, _height, _action) : UIChild(_x, _y, _width, _hei
 	
 	#region Methods
 	
-	on_click = function() {
+	on_primary_action_pressed = function() {
 		
 		script_execute(action);
 	}

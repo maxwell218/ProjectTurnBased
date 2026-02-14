@@ -1,13 +1,13 @@
 {
   "$GMObject":"",
-  "%Name":"obj_inventory",
+  "%Name":"obj_inventory_system",
   "eventList":[],
   "managed":true,
-  "name":"obj_inventory",
+  "name":"obj_inventory_system",
   "overriddenProperties":[],
   "parent":{
-    "name":"TEST",
-    "path":"folders/Objects/TEST.yy",
+    "name":"Inventory",
+    "path":"folders/Objects/Inventory.yy",
   },
   "parentObjectId":null,
   "persistent":false,

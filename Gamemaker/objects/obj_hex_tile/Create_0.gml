@@ -1,5 +1,4 @@
 /// @description Create cell data enum
-
 enum CellData {
 	X,
 	Y,

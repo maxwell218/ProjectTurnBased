@@ -1,4 +1,15 @@
 /// @description Create all game components
+
+#region Methods
+
+load_item_data = function() {
+	
+}
+
+#endregion
+
+#region Variables
+
 enum DepthTable {
 	Cursor,
 	Menu,
@@ -38,3 +49,5 @@ room_set_height(rm_game, HEX_HEIGHT * WORLD_HEIGHT);
 
 // TODO Add proper main menu
 room_goto(rm_ui);
+
+#endregion

@@ -27,10 +27,6 @@ depth = DepthTable.UI;
 
 list1 = array_create(20);
 list2 = array_create(32);
-//list3 = array_create(52);
-
-//lists = [list1, list2, list3];
-//current_list = 0;
 
 injuries_list = new ScrollListView(10, 24, 110, 200, list1);
 injuries_list.init();
@@ -40,7 +36,7 @@ injuries_list2.init();
 
 button = new Button(10, 4, 16, 16, button_clicked);
 
-health_ui_panel = new Panel(0, 0, 400, 250, [injuries_list, injuries_list2, button]);
+health_ui_panel = new Panel(0, 0, 400, 230, [injuries_list, injuries_list2, button]);
 
 #endregion
 

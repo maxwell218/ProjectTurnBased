@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ContainerComponent",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ContainerComponent",
+  "parent":{
+    "name":"Component",
+    "path":"folders/Scripts/Inventory/Component.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

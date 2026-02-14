@@ -1,3 +1,7 @@
-function Inventory() constructor {
-
+function Inventory() {
+	return {
+		equipment_slots: {
+			
+		},
+	};
 }

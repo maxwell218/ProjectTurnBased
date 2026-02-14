@@ -8,6 +8,8 @@ enum Event {
 	AddUIRoot, // Used by the UIManager
 	RemoveUIRoot,
 	BringUIRootToFront,
+	CaptureActiveElement,
+	UnsetActiveElement,
 	
 	// Turn
 	TurnStart, // Used at the start of a new turn

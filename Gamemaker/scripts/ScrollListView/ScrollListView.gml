@@ -97,14 +97,16 @@ function ScrollListView(_x, _y, _width, _height, _children) : UIParent(_x, _y, _
 	on_primary_action_pressed = function() {
 
 		if (pseudo_elements[ScrollListPart.Thumb].is_hovered || pseudo_elements[ScrollListPart.Scrollbar].is_hovered) {
-			scrollbar_selected = true;	
+			scrollbar_selected = true;
+			event_manager_publish(Event.CaptureActiveElement, self);
 		}
 	}
 	
 	on_primary_action_released = function() {
 		
 		if (scrollbar_selected) {
-			scrollbar_selected = false;	
+			scrollbar_selected = false;
+			event_manager_publish(Event.UnsetActiveElement);
 		}
 	}
 	
@@ -119,7 +121,7 @@ function ScrollListView(_x, _y, _width, _height, _children) : UIParent(_x, _y, _
 	
 	cleanup = function() {
 		
-		// Surface free
+		// Clear surface allocation
 		surface_free(surface);
 	}
 	
