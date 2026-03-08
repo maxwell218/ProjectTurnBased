@@ -1,0 +1,1 @@
+ds_map_destroy(lifeform_group_positions);

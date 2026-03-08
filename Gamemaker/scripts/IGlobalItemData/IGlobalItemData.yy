@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"EquipmentComponent",
+  "%Name":"IGlobalItemData",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"EquipmentComponent",
+  "name":"IGlobalItemData",
   "parent":{
-    "name":"Component",
-    "path":"folders/Scripts/Inventory/Component.yy",
+    "name":"Interface",
+    "path":"folders/Scripts/Interface.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

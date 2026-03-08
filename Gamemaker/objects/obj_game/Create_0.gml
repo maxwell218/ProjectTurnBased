@@ -2,10 +2,6 @@
 
 #region Methods
 
-load_item_data = function() {
-	
-}
-
 #endregion
 
 #region Variables
@@ -48,6 +44,6 @@ room_set_width(rm_game, HEX_WIDTH * WORLD_WIDTH * 3/4);
 room_set_height(rm_game, HEX_HEIGHT * WORLD_HEIGHT);
 
 // TODO Add proper main menu
-room_goto(rm_ui);
+room_goto(rm_test);
 
 #endregion

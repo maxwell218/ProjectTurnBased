@@ -1,9 +1,22 @@
-function Item(_item_id, _item_name, _sprite) {
-	return {
-		item_id: _item_id,
-		item_name: _item_name,
-		sprite: _sprite,
+// +--------------------------------------+
+// |                                      |
+// |   __   ______  ______   __    __     |
+// |  /\ \ /\__  _\/\  ___\ /\ "-./  \    |
+// |  \ \ \\/_/\ \/\ \  __\ \ \ \-./\ \   |
+// |   \ \_\  \ \_\ \ \_____\\ \_\ \ \_\  |
+// |    \/_/   \/_/  \/_____/ \/_/  \/_/  |
+// |                                      |
+// +--------------------------------------+
+// class.item
+
+function Item(_config = {}) constructor {
 	
-		components: {},
+	var _self = self;
+	
+	__ = {};
+	
+	with(__) {
+		
 	}
+	
 }

@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"Template",
+  "%Name":"InventoryMacros",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"Template",
+  "name":"InventoryMacros",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"Macros",
+    "path":"folders/Macros.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

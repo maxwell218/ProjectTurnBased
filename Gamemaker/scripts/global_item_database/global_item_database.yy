@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"ContainerComponent",
+  "%Name":"global_item_database",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"ContainerComponent",
+  "name":"global_item_database",
   "parent":{
-    "name":"Component",
-    "path":"folders/Scripts/Inventory/Component.yy",
+    "name":"Datas",
+    "path":"folders/Datas.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

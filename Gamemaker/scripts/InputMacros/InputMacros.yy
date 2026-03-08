@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"InputMacros",
   "parent":{
-    "name":"Config",
-    "path":"folders/Scripts/Config.yy",
+    "name":"Macros",
+    "path":"folders/Macros.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",
