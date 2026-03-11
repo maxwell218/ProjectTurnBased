@@ -20,4 +20,5 @@ if (global.debug) {
 }
 
 // Draw the cursor
+// TODO Round gui position to match pixel perfect scale
 draw_sprite(spr_custom_cursor, 0, gui_x, gui_y);

@@ -21,6 +21,7 @@ global.event_manager = new EventManager();
 var _cam_width = camera_get_view_width(view_camera[0]);
 var _cam_height = camera_get_view_height(view_camera[0]);
 display_set_gui_size(_cam_width, _cam_height);
+surface_resize(application_surface, 480, 270);
 
 window_mouse_set_locked(true);
 
@@ -44,6 +45,6 @@ room_set_width(rm_game, HEX_WIDTH * WORLD_WIDTH * 3/4);
 room_set_height(rm_game, HEX_HEIGHT * WORLD_HEIGHT);
 
 // TODO Add proper main menu
-room_goto(rm_test);
+room_goto(rm_ui);
 
 #endregion

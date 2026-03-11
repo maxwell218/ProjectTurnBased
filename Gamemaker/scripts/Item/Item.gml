@@ -7,7 +7,7 @@
 // |    \/_/   \/_/  \/_____/ \/_/  \/_/  |
 // |                                      |
 // +--------------------------------------+
-// class.item
+// class.Item
 
 function Item(_config = {}) constructor {
 	

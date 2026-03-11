@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"global_colors",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"global_colors",
+  "parent":{
+    "name":"Datas",
+    "path":"folders/Datas.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

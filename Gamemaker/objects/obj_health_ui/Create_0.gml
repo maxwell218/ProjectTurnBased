@@ -45,3 +45,17 @@ health_ui_panel = new Panel(0, 0, 400, 230, [injuries_list, injuries_list2, butt
 event_manager_publish(Event.AddUIRoot, health_ui_panel);
 
 #endregion
+
+stat = new StatBar({
+	x: 12,
+	y: 12,
+	width: 71,
+	height: 5,
+});
+
+stat_2 = new StatBar({
+	x: 12,
+	y: 24,
+	width: 71,
+	height: 5,
+});
