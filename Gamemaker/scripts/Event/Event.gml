@@ -5,6 +5,7 @@ enum Event {
 	GameLoad, // Used to determine if we loaded a save
 	
 	// UI
+	WindowResized,
 	AddUIRoot, // Used by the UIManager
 	RemoveUIRoot,
 	BringUIRootToFront,

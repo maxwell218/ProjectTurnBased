@@ -21,4 +21,3 @@ gui_y = clamp(gui_y, 0, _gui_h);
 
 x = _cam_x + gui_x;
 y = _cam_y + gui_y;
-

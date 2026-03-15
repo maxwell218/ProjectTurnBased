@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"IGlobalItemData",
   "parent":{
-    "name":"Interface",
-    "path":"folders/Scripts/Interface.yy",
+    "name":"Inventory",
+    "path":"folders/Scripts/Inventory.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

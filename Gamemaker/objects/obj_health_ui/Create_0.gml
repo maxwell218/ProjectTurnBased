@@ -1,3 +1,4 @@
+/*
 #region Methods
 
 change_to_next_list = function(_states) {
@@ -23,8 +24,6 @@ button_clicked = function () {
 
 #region Variables
 
-depth = DepthTable.UI;
-
 list1 = array_create(20);
 list2 = array_create(32);
 
@@ -45,6 +44,9 @@ health_ui_panel = new Panel(0, 0, 400, 230, [injuries_list, injuries_list2, butt
 event_manager_publish(Event.AddUIRoot, health_ui_panel);
 
 #endregion
+ */
+
+depth = DepthTable.UI;
 
 stat = new StatBar({
 	x: 12,
@@ -55,7 +57,10 @@ stat = new StatBar({
 
 stat_2 = new StatBar({
 	x: 12,
-	y: 24,
+	y: 32,
 	width: 71,
 	height: 5,
+	// stat_type: "pain",
 });
+
+stat_value = 0;
