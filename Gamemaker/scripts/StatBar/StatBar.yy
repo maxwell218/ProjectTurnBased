@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"StatBar",
   "parent":{
-    "name":"UI",
-    "path":"folders/Scripts/UI.yy",
+    "name":"Element",
+    "path":"folders/Scripts/UI/Element.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

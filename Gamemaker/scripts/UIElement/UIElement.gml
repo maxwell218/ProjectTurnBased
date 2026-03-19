@@ -1,24 +1,71 @@
-function UIElement(_x, _y, _width, _height) constructor {
+// +-------------------+
+// |                   |
+// |   __  __   __     |
+// |  /\ \/\ \ /\ \    |
+// |  \ \ \_\ \\ \ \   |
+// |   \ \_____\\ \_\  |
+// |    \/_____/ \/_/  |
+// |                   |
+// +-------------------+
+// class.UIElement
+
+function UIElement(_config) constructor {
+	var _self = self;
 	
-	#region Methods
+	#region Config
 	
-	add_action = function(_input, _press, _func, _args) {
-		
+	// Public
+	#region Getters
+	
+	static get_x = function() {
+		return __.x;	
+	}
+	static get_y = function() {
+		return __.y;	
+	}
+	static get_width = function() {
+		return __.width;	
+	}
+	static get_height = function() {
+		return __.height;	
+	}
+	static get_is_hovered = function() {
+		return __.is_hovered;
+	}
+	
+	#endregion
+	#region Setters
+	
+	static set_x = function(_x) {
+		__.x = _x;
+	}
+	static set_y = function(_y) {
+		__.y = _y;
+	}
+	static set_width = function(_width) {
+		__.width = _width;
+	}
+	static set_height = function(_height) {
+		__.height = _height;
+	}
+	static set_is_hovered = function(_is_hovered) {
+		__.is_hovered = _is_hovered;	
 	}
 	
 	#endregion
 	
-	#region Variables
+	// Private
+	__ = {}
+	with (__) {
+		// Position and size
+		x = _config[$ "x"] ?? 0;
+		y = _config[$ "y"] ?? 0;
 	
-	x = _x;
-	y = _y;
+		width  = _config[$ "width" ] ?? 0;
+        height = _config[$ "height"] ?? 0;
 	
-	width = _width;
-	height = _height;
-	
-	is_hovered = false;
-	
-	actions = [];
+		is_hovered = _config[$ "is_hovered" ] ?? false;
+	}
 	
 	#endregion
 }

@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"ScrollListView",
+  "%Name":"ScrollList",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"ScrollListView",
+  "name":"ScrollList",
   "parent":{
     "name":"ScrollList",
     "path":"folders/Scripts/UI/Element/ScrollList.yy",

@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"UIParent",
   "parent":{
-    "name":"UI",
-    "path":"folders/Scripts/UI.yy",
+    "name":"Base",
+    "path":"folders/Scripts/UI/Base.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

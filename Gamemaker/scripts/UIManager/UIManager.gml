@@ -7,7 +7,7 @@ function UIManager() constructor {
 		// Reset previous frame's hover state before rebuilding the hover stack
 		var _stack_count = array_length(hovered_stack);
 		for (var _i = 0; _i < _stack_count; _i++) {
-			hovered_stack[_i].is_hovered = false;
+			hovered_stack[_i].set_is_hovered(false);
 		}
 		
 		hovered_stack = [];
@@ -24,7 +24,7 @@ function UIManager() constructor {
 
             // Set hover states
             for (var _i = 0; _i < array_length(hovered_stack); _i++) {
-                hovered_stack[_i].is_hovered = true;
+                hovered_stack[_i].set_is_hovered(true);
             }
         }
 		
@@ -43,7 +43,7 @@ function UIManager() constructor {
 				var _result = process_action(hovered_stack[_i]);
 			
 				if (_result) {
-					break;	
+					break;
 				}
 			}
 		}
@@ -128,10 +128,12 @@ function UIManager() constructor {
 		var _struct_name;
 		
 		if (_struct != undefined) {
+			
+			// Pseudo elements
 			if (variable_struct_exists(_struct, "name")) {
 			    _struct_name = _struct.name;
 			} else {
-			    _struct_name = instanceof(_struct); // optional
+			    _struct_name = instanceof(_struct);
 			}
 		} else {
 			_struct_name = "None";
@@ -160,12 +162,9 @@ function UIManager() constructor {
 	#region Events
 	
 	event_manager_subscribe(Event.AddUIRoot, function(_ui_root) {
-		
 		array_push(ui_roots, _ui_root);
 	});
-	
 	event_manager_subscribe(Event.RemoveUIRoot, function(_ui_root) {
-		
 		var _root_count = array_length(ui_roots);
 		for (var _i = _root_count - 1; _i >= 0; _i--) {
 			if (ui_roots[_i] == _ui_root) {
@@ -174,17 +173,13 @@ function UIManager() constructor {
 			}
 		}
 	});
-	
 	event_manager_subscribe(Event.BringUIRootToFront, function(_ui_root) {
-		
 		event_manager_publish(Event.RemoveUIRoot, _ui_root);
 		event_manager_publish(Event.AddUIRoot, _ui_root);
 	});
-	
 	event_manager_subscribe(Event.CaptureActiveElement, function(_element) {
 		active_element = _element;
 	});
-	
 	event_manager_subscribe(Event.UnsetActiveElement, function() {
 		active_element = undefined;
 	});

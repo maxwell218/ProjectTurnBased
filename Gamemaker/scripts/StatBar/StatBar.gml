@@ -10,15 +10,13 @@
 // class.StatBar
 
 function StatBar(_config = {}) constructor {
-	
 	var _self = self;
 	
 	#region Config
 
 	// Private
 	__ = {};
-    with(__) {
-		
+    with(__) {	
 		// Position and size
 		x = _config[$ "x"] ?? 0;
 		y = _config[$ "y"] ?? 0;
@@ -43,30 +41,25 @@ function StatBar(_config = {}) constructor {
 	
 	// Private
 	with(__) {
-		
 		static __get_stat_color = function(_pct) {
 			switch(__.stat_type) {
-				
 				case "pain":
 					if (_pct < 0.3) return [COLORS.col_green_bright, COLORS.col_green_dark];
 					if (_pct < 0.6) return [COLORS.col_yellow_bright, COLORS.col_yellow_dark];
 					return [COLORS.col_red_bright, COLORS.col_red_dark];
-				
 				default:
 					if (_pct < 0.3) return [COLORS.col_red_bright, COLORS.col_red_dark];
 					if (_pct < 0.6) return [COLORS.col_yellow_bright, COLORS.col_yellow_dark];
 					return [COLORS.col_green_bright, COLORS.col_green_dark];
 			}
 		}
-		
 	}
 	
 	#endregion
 	#region Render
 
 	// Public
-	static render = function(_stat_previous, _stat_current, _stat_max, _event_number) {
-		
+	static render = function(_stat_previous, _stat_current, _stat_max, _event_number) {	
 		// Draw border
 		draw_sprite_stretched(spr_stat_bar_border, 0, __.x, __.y, __.width, __.height);
 		
@@ -77,7 +70,7 @@ function StatBar(_config = {}) constructor {
         var _color  = __get_stat_color(_pct);
         var _bright = COLORS.color_to_rgb(_color[0]);
         var _dark   = COLORS.color_to_rgb(_color[1]);
-		var _scale    = (_event_number == ev_gui) ? VIEW.get_scale() : 1;
+		var _scale  = (_event_number == ev_gui) ? VIEW.get_scale() : 1;
 		
 		var _x = __.inner_x;  // no offset needed
 		var _w = __.inner_width;
@@ -114,5 +107,4 @@ function StatBar(_config = {}) constructor {
 	}
 	
 	#endregion
-	
 }

@@ -79,18 +79,14 @@ check_window_resize = function() {
 	var _h = window_get_height();
 	
 	if (!__.is_fullscreen) {
-		
 		if (_w != 0 && __.window_width != _w) {
 			_is_resize = true;
 		}
-		
 		if (_h != 0 && __.window_height != _h) {
 			_is_resize = true;
 		}
 	}
-	
 	if (_is_resize) {
-		
 		// Window resize event
 		event_manager_publish(Event.WindowResized, [_w, _h]);
 	}
@@ -106,7 +102,7 @@ with (__) {
 	});
 }
 
-// Event
+// Events
 event_manager_subscribe(Event.WindowResized, __.handle_resize);
 
 #endregion
@@ -175,13 +171,13 @@ with (__) {
 	    surface_resize(application_surface, _expanded_w, _expanded_h);
 	    display_set_gui_size(_expanded_w, _expanded_h);
 	
-	    // Port fills the entire window — GUI and app surface are identical
+	    camera_set_view_size(view_camera[0], _expanded_w, _expanded_h);
+		
+		// Port fills the entire window — GUI and app surface are identical
 	    view_set_wport(0, __.window_width);
 	    view_set_hport(0, __.window_height);
 	    view_set_xport(0, 0);
 	    view_set_yport(0, 0);
-	
-	    camera_set_view_size(view_camera[0], _expanded_w, _expanded_h);
 	});
 }
 
