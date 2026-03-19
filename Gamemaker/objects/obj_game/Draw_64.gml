@@ -1,1 +1,0 @@
-global.ui_manager.draw_gui();

@@ -1,15 +1,15 @@
-// +--------------------------------------+
-// |                                      |
-// |   ______   ______  ______   ______   |
-// |  /\  ___\ /\__  _\/\  __ \ /\__  _\  |
-// |  \ \___  \\/_/\ \/\ \  __ \\/_/\ \/  |
-// |   \/\_____\  \ \_\ \ \_\ \_\  \ \_\  |
-// |    \/_____/   \/_/  \/_/\/_/   \/_/  |
-// |                                      |
-// +--------------------------------------+
-// class.StatBar
+// +---------------------------------------------------------+
+// |                                                         |
+// |   ______   ______  ______   ______  __  __   ______     |
+// |  /\  ___\ /\__  _\/\  __ \ /\__  _\/\ \/\ \ /\  ___\    |
+// |  \ \___  \\/_/\ \/\ \  __ \\/_/\ \/\ \ \_\ \\ \___  \   |
+// |   \/\_____\  \ \_\ \ \_\ \_\  \ \_\ \ \_____\\/\_____\  |
+// |    \/_____/   \/_/  \/_/\/_/   \/_/  \/_____/ \/_____/  |
+// |                                                         |
+// +---------------------------------------------------------+
+// class.StatusBar
 
-function StatBar(_config = {}) constructor {
+function StatusBar(_config = {}) constructor {
 	var _self = self;
 	
 	#region Config
@@ -70,9 +70,9 @@ function StatBar(_config = {}) constructor {
         var _color  = __get_stat_color(_pct);
         var _bright = COLORS.color_to_rgb(_color[0]);
         var _dark   = COLORS.color_to_rgb(_color[1]);
-		var _scale  = (_event_number == ev_gui) ? VIEW.get_scale() : 1;
+		var _scale  = (_event_number == ev_gui) ? VIEW_MANAGER.get_scale() : 1;
 		
-		var _x = __.inner_x;  // no offset needed
+		var _x = __.inner_x;
 		var _w = __.inner_width;
 
         // Set shader + uniforms
@@ -86,7 +86,6 @@ function StatBar(_config = {}) constructor {
 
         // Draw fill
         draw_sprite_stretched(spr_stat_bar_fill, 0, __.inner_x, __.inner_y, __.inner_width, __.inner_height);
-
         shader_reset();
 		
 		// Trend indicator (optional)

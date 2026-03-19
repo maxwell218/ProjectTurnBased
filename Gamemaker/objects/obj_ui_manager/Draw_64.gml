@@ -7,6 +7,6 @@
 // |    \/_____/ \/_/  |
 // |                   |
 // +-------------------+
-// obj_ui_manager.step
+// obj_ui_manager.draw_gui
 
-step();
+render_gui();

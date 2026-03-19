@@ -1,1 +1,0 @@
-global.ui_manager.step();

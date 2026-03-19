@@ -62,13 +62,18 @@ function ScrollListItem(_config) : UIChild(_config) constructor {
 	// Private
 	with (__) {
 		static __render_border = function(_context, _color) {
+			var _axis = _context.scroll_axis;
 			var _x = round(__.x - _context.scroll_x);
 			var _y = round(__.y - _context.scroll_y);
 			var _b_style = _context.border_style;
 		
 			draw_set_color(_color);
 			if (_b_style == ScrollListBorderStyle.Shared) {
-				draw_rectangle(_x + 1, _y + 1, _x + __.width, _y + __.height - 1, true);
+				if (_axis == ScrollAxis.Vertical) {
+					draw_rectangle(_x + 1, _y + 1, _x + __.width - 1, _y + __.height, true);
+				} else {
+					draw_rectangle(_x + 1, _y + 1, _x + __.width, _y + __.height - 1, true);
+				}
 			} else {
 				draw_rectangle(_x + 1, _y + 1, _x + __.width - 1, _y + __.height - 1, true);
 			}

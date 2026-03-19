@@ -48,36 +48,36 @@ event_manager_publish(Event.AddUIRoot, health_ui_panel);
 
 depth = DepthTable.UI;
 
-stat = new StatBar({
-	x: 12,
-	y: 48,
-	width: 71,
-	height: 5,
-});
+//stat = new StatusBar({
+//	x: 12,
+//	y: 48,
+//	width: 71,
+//	height: 5,
+//});
 
 stat_value = 0;
 
 list1 = array_create(20);
 
-list = new ScrollList({
-	x: 0,
-	y: 0,
-	width: 480,
-	height: 42,
-	padding: 0,
-	scroll_axis: ScrollAxis.Horizontal,
-	children: list1,
-});
-
 //list = new ScrollList({
 //	x: 0,
 //	y: 0,
-//	width: 100,
-//	height: 100,
-//	padding: 5,
-//	scroll_axis: ScrollAxis.Vertical,
+//	width: 480,
+//	height: 42,
+//	padding: 0,
+//	scroll_axis: ScrollAxis.Horizontal,
 //	children: list1,
 //});
+
+list = new ScrollList({
+	x: 0,
+	y: 0,
+	width: 200,
+	height: 200,
+	padding: 0,
+	scroll_axis: ScrollAxis.Vertical,
+	children: list1,
+});
 
 list.init();
 
@@ -85,7 +85,7 @@ health_ui_panel = new Panel({
 	x: 0,
 	y: 0,
 	width: 480,
-	height: 100,
+	height: 200,
 	children: [list],	
 });
 

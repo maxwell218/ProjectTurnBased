@@ -17,7 +17,7 @@ if (variable_struct_exists(global, "view_manager") && global.view_manager != id)
 	show_error("global.view_manager already exists", true);
 }
 global.view_manager = id;
-#macro VIEW global.view_manager
+#macro VIEW_MANAGER global.view_manager
 
 #endregion
 #region Config

@@ -20,6 +20,7 @@ enum ScrollListPart {
 enum ScrollListBorderStyle {
 	Shared, // Items in the list share the same borders
 	Split, // Each item in the list have their own set of borders
+	// TODO Implement "None" border
 }
 
 function ScrollList(_config) : UIParent(_config) constructor {
@@ -43,7 +44,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
         scroll_speed  = _config[$ "scroll_speed"] ?? 20;
 
         // Scrollbar appearance
-        scrollbar_color     = _config[$ "scrollbar_color"    ] ?? c_ltgray;
+        scrollbar_color     = _config[$ "scrollbar_color"    ] ?? COLORS.col_green_dark;
         scrollbar_thickness = _config[$ "scrollbar_thickness"] ?? 5;
         scrollbar_padding   = _config[$ "scrollbar_padding"  ] ?? 1;
         scrollbar_thumb_min = _config[$ "scrollbar_thumb_min"] ?? 20;
@@ -262,6 +263,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
         draw_rectangle(0, 0, __.width, __.height, false);
 		
 		var _context = {
+			scroll_axis: __.scroll_axis,
             scroll_x: (__.scroll_axis == ScrollAxis.Horizontal) ? __.scroll : 0,
             scroll_y: (__.scroll_axis == ScrollAxis.Vertical)   ? __.scroll : 0,
 			border_style: __.border_style,
@@ -281,7 +283,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
         }
 		
 		// Render hover
-		if (_hovered_child != undefined && global.ui_manager.active_element == undefined) {
+		if (_hovered_child != undefined && UI_MANAGER.get_active_element() == undefined) {
 			_hovered_child.render_hover(_context);
 		}
 

@@ -29,9 +29,9 @@ draw_set_font(fnt_04b03);
 // Create main menu necessities
 global.cursor = instance_create_layer(x, y, "UI", obj_cursor);
 global.input = instance_create_layer(x, y, "Controllers", obj_input);
-global.ui_manager = new UIManager();
+global.ui_manager = instance_create_layer(x, y, "Controllers", obj_ui_manager);
 global.view_manager = instance_create_layer(x, y, "Controllers", obj_view_manager);
-VIEW.initialize();
+VIEW_MANAGER.initialize();
 
 // Initialise global game objects
 global.world = noone;
