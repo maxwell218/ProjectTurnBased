@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"LayoutSizeHug",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"LayoutSizeHug",
+  "parent":{
+    "name":"Layout",
+    "path":"folders/Scripts/UI/Element/Layout.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -17,7 +17,7 @@ enum InjuryAttribute {
 	Pain,			// Ranges from 0 to 1
 	BleedingRate,	// Ranges from 0 to 1
 	Infection,
-	Last
+	Last,
 }
 
 function Injury(_type, _state, _severity) constructor {

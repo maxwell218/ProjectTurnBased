@@ -65,6 +65,7 @@ list1 = array_create(20);
 //	width: 480,
 //	height: 42,
 //	padding: 0,
+//	content_height: 36,
 //	scroll_axis: ScrollAxis.Horizontal,
 //	children: list1,
 //});
@@ -74,8 +75,9 @@ list = new ScrollList({
 	y: 0,
 	width: 200,
 	height: 200,
-	padding: 0,
+	padding: 5,
 	scroll_axis: ScrollAxis.Vertical,
+	size_mode: ScrollListSizeMode.PushLayout,
 	children: list1,
 });
 
@@ -86,7 +88,7 @@ health_ui_panel = new Panel({
 	y: 0,
 	width: 480,
 	height: 200,
-	children: [list],	
+	children: [list],
 });
 
 #region Events

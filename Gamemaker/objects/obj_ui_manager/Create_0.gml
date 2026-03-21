@@ -96,7 +96,7 @@ clear_hovered_stack = function() {
 get_hovered_stack = function(_mouse_x, _mouse_y) {
 	// Check all roots
 	var _root_count = array_length(__.ui_roots);
-	for (var _i = _root_count - 1; _i >= 0; _i--) {	
+	for (var _i = _root_count - 1; _i >= 0; _i--) {
 		// Check root for hovered element (can be self)
 		var _root = __.ui_roots[_i];
 		_root.collect_hover(_mouse_x, _mouse_y, __.hovered_stack);

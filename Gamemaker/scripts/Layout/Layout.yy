@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"StatBar",
+  "%Name":"Layout",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"StatBar",
+  "name":"Layout",
   "parent":{
-    "name":"Element",
-    "path":"folders/Scripts/UI/Element.yy",
+    "name":"Layout",
+    "path":"folders/Scripts/UI/Element/Layout.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

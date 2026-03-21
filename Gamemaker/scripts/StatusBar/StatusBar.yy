@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"StatusBar",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"StatusBar",
+  "parent":{
+    "name":"Element",
+    "path":"folders/Scripts/UI/Element.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

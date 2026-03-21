@@ -44,8 +44,8 @@
   },
   "origin":0,
   "parent":{
-    "name":"StatBar",
-    "path":"folders/Sprites/UI/StatBar.yy",
+    "name":"StatusBar",
+    "path":"folders/Sprites/UI/StatusBar.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

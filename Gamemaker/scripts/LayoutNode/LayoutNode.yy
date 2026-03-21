@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"LayoutNode",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"LayoutNode",
+  "parent":{
+    "name":"Layout",
+    "path":"folders/Scripts/UI/Element/Layout.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
