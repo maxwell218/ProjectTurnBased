@@ -7,17 +7,27 @@
 // |    \/_____/ \/_/\/_/ \/_____/ \/_____/ \/_____/   \/_/  |
 // |                                                         |
 // +---------------------------------------------------------+
-// class.LayoutSizeHug
+// class.LayoutFixed
 
-function LayoutSizeHug() constructor {
+function LayoutFixed(_config) constructor {
 	var _self = self;
 	
-    #region Resolve
-
-    // Public
-    static resolve = function(_fill_unit = 0, _content_size = 0) {
-        return _content_size;
+	#region Config
+	
+	// Public
+	#region Getters
+	
+	static get_type   = function() { return __.type;   }
+    static get_pixels = function() { return __.pixels; }
+	
+	#endregion
+	
+	// Private
+    __ = {};
+    with (__) {
+        type   = LayoutSizeType.Fixed;
+        pixels = _config[$ "pixels"] ?? undefined;
     }
-
-    #endregion
+		
+	#endregion
 }

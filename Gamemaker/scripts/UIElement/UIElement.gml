@@ -61,11 +61,11 @@ function UIElement(_config) constructor {
 	__ = {}
 	with (__) {
 		// Position and size
-		x = _config[$ "x"] ?? 0;
-		y = _config[$ "y"] ?? 0;
+		x = _config[$ "x"] ?? undefined;
+		y = _config[$ "y"] ?? undefined;
 	
-		width  = _config[$ "width" ] ?? 0;
-        height = _config[$ "height"] ?? 0;
+		width  = _config[$ "width" ] ?? undefined;
+        height = _config[$ "height"] ?? undefined;
 	
 		is_hovered = _config[$ "is_hovered" ] ?? false;
 	}

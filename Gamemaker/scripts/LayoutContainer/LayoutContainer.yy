@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"LayoutSizeHug",
+  "%Name":"LayoutContainer",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"LayoutSizeHug",
+  "name":"LayoutContainer",
   "parent":{
     "name":"Layout",
     "path":"folders/Scripts/UI/Element/Layout.yy",

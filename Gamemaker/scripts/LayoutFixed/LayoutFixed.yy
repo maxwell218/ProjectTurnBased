@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"Layout",
+  "%Name":"LayoutFixed",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"Layout",
+  "name":"LayoutFixed",
   "parent":{
     "name":"Layout",
     "path":"folders/Scripts/UI/Element/Layout.yy",

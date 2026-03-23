@@ -7,33 +7,27 @@
 // |    \/_____/ \/_/\/_/ \/_____/ \/_____/ \/_____/   \/_/  |
 // |                                                         |
 // +---------------------------------------------------------+
-// class.LayoutSizeFill
+// class.LayoutFill
 
-function LayoutSizeFill(_config = {}) constructor {
+function LayoutFill(_config = {}) constructor {
 	var _self = self;
 	
-    #region Config
+	#region Config
 	
 	// Public
 	#region Getters
-
-    static get_share = function() { return __.share; }
-
-    #endregion
+	
+	static get_type   = function() { return __.type;   }
+    static get_weight = function() { return __.weight; }
+	
+	#endregion
 	
 	// Private
-	__ = {};
+    __ = {};
     with (__) {
-        share = _config[$ "share"] ?? 1;
+        type   = LayoutSizeType.Fill;
+        weight = _config[$ "weight"] ?? 1;
     }
-
-    #endregion
-    #region Resolve
-
-    // Public
-    static resolve = function(_fill_unit = 0, _content_size = 0) {
-        return round(__.share * _fill_unit);
-    }
-
-    #endregion
+	
+	#endregion
 }

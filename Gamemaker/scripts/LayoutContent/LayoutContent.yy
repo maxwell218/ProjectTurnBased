@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"LayoutSizeFill",
+  "%Name":"LayoutContent",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"LayoutSizeFill",
+  "name":"LayoutContent",
   "parent":{
     "name":"Layout",
     "path":"folders/Scripts/UI/Element/Layout.yy",

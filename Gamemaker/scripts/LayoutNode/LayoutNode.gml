@@ -10,59 +10,56 @@
 // class.LayoutNode
 
 function LayoutNode(_config) constructor {
-	var _self = self;
-
-    #region Config
 	
 	// Public
 	#region Getters
-
-    static get_element         = function() { return __.element;         }
-    static get_width           = function() { return __.width;           }
-    static get_height          = function() { return __.height;          }
+	
+	static get_element         = function() { return __.element;         }
+    static get_size_x          = function() { return __.size_x;          }
+    static get_size_y          = function() { return __.size_y;          }
     static get_margin          = function() { return __.margin;          }
-    static get_is_dirty        = function() { return __.is_dirty;        }
     static get_resolved_x      = function() { return __.resolved_x;      }
     static get_resolved_y      = function() { return __.resolved_y;      }
     static get_resolved_width  = function() { return __.resolved_width;  }
     static get_resolved_height = function() { return __.resolved_height; }
-
-    #endregion
-
+	
+	#endregion
+	
 	// Private
     __ = {};
     with (__) {
-        element				= _config[$ "element"];
-        width				= _config[$ "width"  ] ?? new LayoutSizeFill();
-        height				= _config[$ "height" ] ?? new LayoutSizeFill();
-        margin				= new LayoutMargin(_config[$ "margin"] ?? 0);
-        parent_layout		= _config[$ "parent_layout"];
-        is_dirty			= true;
+        element = _config[$ "element"];
+        size_x  = _config[$ "size_x" ] ?? new LayoutFill();
+        size_y  = _config[$ "size_y" ] ?? new LayoutFill();
 
-        // Cached resolved values — undefined until first resolve
-        resolved_x      = undefined;
-        resolved_y      = undefined;
-        resolved_width  = undefined;
-        resolved_height = undefined;
+        var _m  = _config[$ "margin"] ?? 0;
+        margin  = is_real(_m) ? new LayoutMargin(_m) : _m;
+
+        // Optional measurement callback — function(_element) -> { width, height }
+        // Must be provided when size_x or size_y is LayoutContent.
+        measure = _config[$ "measure"] ?? undefined;
+
+        // Written by LayoutContainer during solve()
+        resolved_x      = 0;
+        resolved_y      = 0;
+        resolved_width  = 0;
+        resolved_height = 0;
     }
 
-    #endregion
-    #region Dirty
+    // Invoked by LayoutContainer — calls the measure callback if present
+    static get_content_size = function() {
+        if (__.measure == undefined) {
+            show_error("LayoutNode: LayoutContent used but no measure callback provided.", true);
+        }
+        return __.measure(__.element);
+    }
 
-    // Public
-    static mark_dirty = function() {
-        __.is_dirty = true;
-        __.parent_layout.mark_dirty(self);
-    }
-    static clear_dirty = function() {
-        __.is_dirty = false;
-    }
-    static set_resolved = function(_x, _y, _width, _height) {
+    // Pushes the solved rect back into the wrapped element
+    static apply_resolved = function(_x, _y, _w, _h) {
         __.resolved_x      = _x;
         __.resolved_y      = _y;
-        __.resolved_width  = _width;
-        __.resolved_height = _height;
+        __.resolved_width  = _w;
+        __.resolved_height = _h;
+        __.element.resize({ x: _x, y: _y, width: _w, height: _h });
     }
-
-    #endregion
 }

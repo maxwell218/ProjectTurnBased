@@ -22,8 +22,8 @@ enum ScrollListBorderStyle {
     Split,  // Each item in the list have their own set of borders
 }
 enum ScrollListSizeMode {
-    ShrinkContent, // List size is fixed, items shrink by scrollbar_thickness when bar appears
-    PushContent,    // Item area is fixed, list grows by scrollbar_thickness when bar appears, marks parent layout dirty
+    ScrollbarIncluded, // List size is fixed, items shrink by scrollbar_thickness when bar appears
+    ScrollbarExcluded, // Item area is fixed, list grows by scrollbar_thickness when bar appears
 }
 
 function ScrollList(_config) : UIParent(_config) constructor {
@@ -32,19 +32,33 @@ function ScrollList(_config) : UIParent(_config) constructor {
     #region Config
 	
 	// Public
-	static get_content_size = function() {
-	    var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
+	#region Getters
+	
+	static get_width = function() {
 	    var _w = __.width;
-	    var _h = __.height;
-	    if (__.size_mode == ScrollListSizeMode.PushContent && __.scrollbar_needed) {
-	        if (_is_vertical) {
-	            _w += __.scrollbar_thickness;
-	        } else {
-	            _h += __.scrollbar_thickness;
-	        }
+
+	    if (__.scroll_axis == ScrollAxis.Vertical
+	    &&  __.size_mode == ScrollListSizeMode.ScrollbarExcluded
+	    &&  __.has_scrollbar) {
+	        _w += __.scrollbar_thickness;
 	    }
-	    return { width: _w, height: _h };
+
+	    return _w;
 	}
+
+	static get_height = function() {
+	    var _h = __.height;
+
+	    if (__.scroll_axis == ScrollAxis.Horizontal
+	    &&  __.size_mode == ScrollListSizeMode.ScrollbarExcluded
+	    &&  __.has_scrollbar) {
+	        _h += __.scrollbar_thickness;
+	    }
+
+	    return _h;
+	}
+	
+	#endregion
 
     // Private
     with (__) {
@@ -52,7 +66,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
         scroll_axis = _config[$ "scroll_axis"] ?? ScrollAxis.Vertical;
 
         // Size mode
-        size_mode = _config[$ "size_mode"] ?? ScrollListSizeMode.ShrinkContent;
+        size_mode = _config[$ "size_mode"] ?? ScrollListSizeMode.ScrollbarIncluded;
 
         // Padding
         padding      = _config[$ "padding"] ?? 0;
@@ -65,7 +79,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
         scroll_speed  = _config[$ "scroll_speed"] ?? 20;
 
         // Scrollbar appearance
-		scrollbar_needed	= false;
+        scrollbar_needed    = false;
         scrollbar_color     = _config[$ "scrollbar_color"    ] ?? COLORS.col_green_dark;
         scrollbar_thickness = _config[$ "scrollbar_thickness"] ?? 5;
         scrollbar_padding   = _config[$ "scrollbar_padding"  ] ?? 1;
@@ -77,10 +91,11 @@ function ScrollList(_config) : UIParent(_config) constructor {
         line_height = _config[$ "line_height"] ?? 8;
 
         // Content / surface
-        content_size  = 0;
-        surface       = -1;
+        content_size = 0;
+        surface      = -1;
 
-        // Overflow state — used by PushContent to detect changes
+        // has_scrollbar is the single source of truth for whether the bar
+        // is visible — drives rendering and hover detection in both modes
         has_scrollbar = false;
 
         // Visible-child culling
@@ -154,9 +169,9 @@ function ScrollList(_config) : UIParent(_config) constructor {
 
         // --- Scrollbar drag ---
         if (__.scrollbar_selected) {
-            var _local_pos  = _is_vertical
-                              ? (obj_cursor.gui_y - __.y)
-                              : (obj_cursor.gui_x - __.x);
+            var _local_pos = _is_vertical
+                             ? (obj_cursor.gui_y - __.y)
+                             : (obj_cursor.gui_x - __.x);
 
             // TODO: On scrollbar selected, record cursor position
             var _thumb_size = __get_thumb_size();
@@ -223,74 +238,70 @@ function ScrollList(_config) : UIParent(_config) constructor {
 
     // Public
     static rebuild_content = function() {
-        var _is_vertical    = (__.scroll_axis == ScrollAxis.Vertical);
-        var _count          = array_length(__.children);
-        var _border_offset  = (__.border_style == ScrollListBorderStyle.Shared) ? 1 : 0;
-        var _cursor         = __.padding;
+	    var _is_vertical   = (__.scroll_axis == ScrollAxis.Vertical);
+	    var _count         = array_length(__.children);
+	    var _border_offset = (__.border_style == ScrollListBorderStyle.Shared) ? 1 : 0;
+	    var _cursor        = __.padding;
 
-        // --- Pass 1: Measure ---
-        // Position children along the main axis, compute total content_size.
-        // Cross-axis size is set here based on size_mode — ShrinkContent starts
-        // at full width and may shrink in pass 2, PushContent
-        // set their final cross-axis size now and never change it.
+	    // --- Pass 1: Measure (NO scrollbar logic here) ---
+	    var _cross_full = (_is_vertical ? __.width : __.height) - __.padding * 2;
+	    var _cross_size = _cross_full - _border_offset;
 
-        var _cross_size = _is_vertical ? __.width : __.height;
+	    for (var _i = 0; _i < _count; _i++) {
+	        var _item = __.children[_i];
 
-        switch (__.size_mode) {
-            case ScrollListSizeMode.ShrinkContent:
-                // Items start at full cross size, may shrink in pass 2 if overflow detected
-                _cross_size = (_is_vertical ? __.width : __.height) - __.padding * 2;
-                break;
-            case ScrollListSizeMode.PushContent:
-                // Items always take full cross size — list grows outward if bar appears
-                _cross_size = (_is_vertical ? __.width : __.height) - __.padding * 2;
-                break;
-        }
+	        if (_is_vertical) {
+	            _item.set_x(__.padding);
+	            _item.set_y(_cursor);
+	            _item.set_width(_cross_size);
+	            _cursor += _item.get_height() + __.padding + 1;
+	        } else {
+	            _item.set_x(_cursor);
+	            _item.set_y(__.padding);
+	            _item.set_height(_cross_size);
+	            _cursor += _item.get_width() + __.padding + 1;
+	        }
+	    }
 
-        for (var _i = 0; _i < _count; _i++) {
-            var _item = __.children[_i];
-            if (_is_vertical) {
-                _item.set_x(__.padding);
-                _item.set_y(_cursor);
-                _item.set_width(_cross_size - 1);
-                _cursor += _item.get_height() + __.padding + 1;
-            } else {
-                _item.set_x(_cursor);
-                _item.set_y(__.padding);
-                _item.set_height(_cross_size - 1);
-                _cursor += _item.get_width() + __.padding + 1;
-            }
-        }
-
-        var _view_size		= _is_vertical ? __.height : __.width;
-        __.content_size		= max(_cursor + _border_offset, _view_size);
-        __.scrollbar_needed = (__.content_size > _view_size);
-
-        // --- Pass 2: Overflow ---
-        // Handle scrollbar consequence per size_mode
-
-        switch (__.size_mode) {
-            case ScrollListSizeMode.ShrinkContent:
-                // Shrink items on the cross axis to make room for the scrollbar
-                if (__.scrollbar_needed) {
-                    for (var _i = 0; _i < _count; _i++) {
-                        var _item = __.children[_i];
-                        if (_is_vertical) {
-                            _item.set_width(_item.get_width() - __.scrollbar_thickness);
-                        } else {
-                            _item.set_height(_item.get_height() - __.scrollbar_thickness);
-                        }
-                    }
-                }
-                break;
-	        case ScrollListSizeMode.PushContent:
-				// PushContent case — notify layout if overflow state changed
-	            if (__.scrollbar_needed != __.has_scrollbar) {
-	                __.has_scrollbar = __.scrollbar_needed;
-	            }
-	            break;
-        }
-    }
+	    var _view_size      = _is_vertical ? __.height : __.width;
+	    __.content_size     = max(_cursor + _border_offset, _view_size);
+	    __.scrollbar_needed = (__.content_size > _view_size);
+	    __.has_scrollbar    = __.scrollbar_needed;
+	    
+		var _item_w = _cross_size;
+		var _item_h = _cross_size;
+	    
+		switch (__.size_mode) {
+			case ScrollListSizeMode.ScrollbarIncluded:
+				if (__.has_scrollbar) {
+					if (_is_vertical) {
+						_item_w -= __.scrollbar_thickness;
+					} else {
+						_item_h -= __.scrollbar_thickness;
+					}
+				}
+				break;
+			case ScrollListSizeMode.ScrollbarExcluded:
+				if (__.has_scrollbar) {
+					if (_is_vertical) {
+						_item_w -= __.scrollbar_thickness;
+					} else {
+						_item_h -= __.scrollbar_thickness;
+					}	
+				}
+				break;
+		}
+		
+		// --- Pass 2: ONLY shrink in Included mode ---
+		for (var _i = 0; _i < _count; _i++) {
+	        var _item = __.children[_i];
+	        if (_is_vertical) {
+	            _item.set_width(_item_w);
+	        } else {
+	            _item.set_height(_item_h);
+	        }
+	    }
+	}
 
     #endregion
     #region Render
@@ -298,11 +309,10 @@ function ScrollList(_config) : UIParent(_config) constructor {
     // Public
     static render = function() {
         var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
-        var _view_size   = _is_vertical ? __.height : __.width;
 
         if (!surface_exists(__.surface)) {
-            __.surface = surface_create(__.width, __.height);
-        }
+		    __.surface = surface_create(get_width(), get_height());
+		}
 
         surface_set_target(__.surface);
         draw_clear_alpha(c_black, 0);
@@ -311,9 +321,9 @@ function ScrollList(_config) : UIParent(_config) constructor {
         draw_rectangle(0, 0, __.width, __.height, false);
 
         var _context = {
-            scroll_axis: __.scroll_axis,
-            scroll_x:    (__.scroll_axis == ScrollAxis.Horizontal) ? __.scroll : 0,
-            scroll_y:    (__.scroll_axis == ScrollAxis.Vertical)   ? __.scroll : 0,
+            scroll_axis:  __.scroll_axis,
+            scroll_x:     (__.scroll_axis == ScrollAxis.Horizontal) ? __.scroll : 0,
+            scroll_y:     (__.scroll_axis == ScrollAxis.Vertical)   ? __.scroll : 0,
             border_style: __.border_style,
         };
 
@@ -332,52 +342,9 @@ function ScrollList(_config) : UIParent(_config) constructor {
             _hovered_child.render_hover(_context);
         }
 
-        // Scrollbar — rendered when overflowed
-        var _render_scrollbar = __.scrollbar_needed;
-
-        if (_render_scrollbar) {
-            var _thumb_size = __get_thumb_size();
-            var _thumb_pos  = (__.content_size > _view_size)
-                              ? (__.scroll / (__.content_size - _view_size) * (_view_size - _thumb_size))
-                              : 0;
-            var _sb_padding = __.scrollbar_padding;
-            _thumb_pos = clamp(_thumb_pos, _sb_padding, _view_size - _thumb_size - _sb_padding - 1);
-
-            if (_is_vertical) {
-                var _sx = __.width - __.scrollbar_thickness;
-                draw_set_color(c_olive);
-                draw_rectangle(_sx, 0, __.width, __.height, false);
-                if (__.content_size > _view_size) {
-                    draw_set_color(
-                        (__.scrollbar_selected || __.pseudo_elements[ScrollListPart.Thumb].is_hovered)
-                        ? c_white : __.scrollbar_color
-                    );
-                    draw_rectangle(
-                        _sx + _sb_padding,
-                        _thumb_pos,
-                        __.width - _sb_padding - 1,
-                        _thumb_pos + _thumb_size,
-                        false
-                    );
-                }
-            } else {
-                var _sy = __.height - __.scrollbar_thickness;
-                draw_set_color(c_olive);
-                draw_rectangle(0, _sy, __.width, __.height, false);
-                if (__.content_size > _view_size) {
-                    draw_set_color(
-                        (__.scrollbar_selected || __.pseudo_elements[ScrollListPart.Thumb].is_hovered)
-                        ? c_white : __.scrollbar_color
-                    );
-                    draw_rectangle(
-                        _thumb_pos,
-                        _sy + _sb_padding,
-                        _thumb_pos + _thumb_size,
-                        __.height - _sb_padding - 1,
-                        false
-                    );
-                }
-            }
+        if (__.has_scrollbar) {
+            __render_scrollbar();
+			__render_thumb();
         }
 
         draw_set_color(c_white);
@@ -391,6 +358,43 @@ function ScrollList(_config) : UIParent(_config) constructor {
             draw_text(__.x, __.y + __.height, "scroll = " + string(__.scroll));
             draw_text(__.x, __.y + __.height + __.line_height, "content_size = " + string(__.content_size));
         }
+    }
+
+    // Private
+    with (__) {
+        static __render_scrollbar = function() {
+            var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
+			draw_set_color(c_olive);
+			
+            if (_is_vertical) {
+                var _sx = __.width - __.scrollbar_thickness;
+                draw_rectangle(_sx, 0, __.width, __.height, false);
+            } else {
+                var _sy = __.height - __.scrollbar_thickness;
+                draw_rectangle(0, _sy, __.width, _sy + __.scrollbar_thickness, false);
+            }
+        }
+		static __render_thumb = function() {
+			var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
+			var _view_size = _is_vertical ? __.height :__.width;
+            var _thumb_size  = __get_thumb_size();
+            var _thumb_pos   = __.scroll / (__.content_size - _view_size) * (_view_size - _thumb_size);
+            var _sb_padding  = __.scrollbar_padding;
+			
+			// Clamp thumb
+            _thumb_pos = clamp(_thumb_pos, _sb_padding, _view_size - _thumb_size - _sb_padding - 1);
+			
+			var _thumb_color = (__.scrollbar_selected || __.pseudo_elements[ScrollListPart.Thumb].is_hovered) ? c_white : __.scrollbar_color;
+			draw_set_color(_thumb_color);
+			
+			if (_is_vertical) {
+				var _sx = __.width - __.scrollbar_thickness;
+				draw_rectangle(_sx + _sb_padding, _thumb_pos, __.width - _sb_padding - 1, _thumb_pos + _thumb_size, false);
+			} else {
+				var _sy = __.height - __.scrollbar_thickness;
+				draw_rectangle(_thumb_pos, _sy + _sb_padding, _thumb_pos + _thumb_size, _sy + __.scrollbar_thickness - _sb_padding - 1, false);
+			}
+		}
     }
 
     #endregion
@@ -417,28 +421,31 @@ function ScrollList(_config) : UIParent(_config) constructor {
     // Private
     with (__) {
         static __is_hover_scrollbar = function(_mouse_x, _mouse_y) {
+            if (!__.has_scrollbar) return false;
+
             var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
-            var _view_size   = _is_vertical ? __.height : __.width;
-
-            if (__.content_size <= _view_size) return false;
-
             var _mx = _mouse_x - __.x;
             var _my = _mouse_y - __.y;
 
             if (_is_vertical) {
-                var _sb_x = __.width - __.scrollbar_thickness;
-                return (_mx >= _sb_x && _mx <= __.width && _my >= 0 && _my <= __.height);
+                // Bar is always at the right edge inside the surface width —
+                // same rect in both size modes
+                var _sx = __.width - __.scrollbar_thickness;
+                return (_mx >= _sx && _mx <= __.width
+                    &&  _my >= 0   && _my <= __.height);
             } else {
-                var _sb_y = __.height - __.scrollbar_thickness;
-                return (_mx >= 0 && _mx <= __.width && _my >= _sb_y && _my <= __.height);
+                // Mirror __render_scrollbar: _sy is the top of the track rect
+                var _sy = __.height - __.scrollbar_thickness;
+                return (_mx >= 0   && _mx <= __.width
+                    &&  _my >= _sy && _my <= _sy + __.scrollbar_thickness);
             }
         }
+
         static __is_hover_thumb = function(_mouse_x, _mouse_y) {
+            if (!__.has_scrollbar) return false;
+
             var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
-            var _view_size   = _is_vertical ? __.height : __.width;
-
-            if (__.content_size <= _view_size) return false;
-
+            var _view_size = _is_vertical ? __.height : __.width;
             var _mx = _mouse_x - __.x;
             var _my = _mouse_y - __.y;
 
@@ -447,15 +454,16 @@ function ScrollList(_config) : UIParent(_config) constructor {
             _thumb_pos      = clamp(_thumb_pos, __.scrollbar_padding, _view_size - _thumb_size - __.scrollbar_padding - 1);
 
             if (_is_vertical) {
-                var _sb_x  = __.width - __.scrollbar_thickness + __.scrollbar_padding;
-                var _sb_x2 = __.width - __.scrollbar_padding;
-                if (_mx < _sb_x || _mx > _sb_x2) return false;
-                return (_my >= _thumb_pos && _my <= _thumb_pos + _thumb_size);
+                var _sx  = __.width - __.scrollbar_thickness + __.scrollbar_padding;
+                var _sx2 = __.width - __.scrollbar_padding - 1;
+                return (_mx >= _sx  && _mx <= _sx2
+                    &&  _my >= _thumb_pos && _my <= _thumb_pos + _thumb_size);
             } else {
-                var _sb_y  = __.height - __.scrollbar_thickness + __.scrollbar_padding;
-                var _sb_y2 = __.height - __.scrollbar_padding;
-                if (_my < _sb_y || _my > _sb_y2) return false;
-                return (_mx >= _thumb_pos && _mx <= _thumb_pos + _thumb_size);
+                var _sy = __.height - __.scrollbar_thickness;
+                var _sy1 = _sy  + __.scrollbar_padding;
+                var _sy2 = _sy  + __.scrollbar_thickness - __.scrollbar_padding - 1;
+                return (_mx >= _thumb_pos && _mx <= _thumb_pos + _thumb_size
+                    &&  _my >= _sy1       && _my <= _sy2);
             }
         }
     }

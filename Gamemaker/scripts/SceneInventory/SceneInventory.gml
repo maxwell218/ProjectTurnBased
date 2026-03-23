@@ -10,79 +10,86 @@
 // class.SceneInventory
 
 function SceneInventory(_config) : Scene(_config) constructor {
-	var _self = self;
+    var _self = self;
+
+    #region Build
 	
-	#region Build
-
-    // Public
     static build = function() {
-		var _list = array_create(20);
-        // --- Elements ---
-        __.elements.unit_list = new ScrollList({
-			height: 42,
-			children: _list,
-            scroll_axis: ScrollAxis.Horizontal,
-            size_mode:   ScrollListSizeMode.ShrinkContent,
-        });
-        // __.elements.unit_list			= new UIPlaceholder({width: 0, height: 42});  // TODO replace with real element
-        __.elements.equipment_left		= new UIPlaceholder({});  // TODO replace with real element
-        __.elements.containers_left		= new UIPlaceholder({});  // TODO replace with real element
-        __.elements.equipment_right		= new UIPlaceholder({});  // TODO replace with real element
-        __.elements.containers_right	= new UIPlaceholder({});  // TODO replace with real element
-        __.elements.navbar				= new UIPlaceholder({});  // TODO replace with real element
+        var _list = array_create(1);
 
-        // --- Inner row layout ---
-        var _row = new Layout({ axis: LayoutAxis.Row });
+        // --- Elements ---
+        __.elements.unit_list        = new ScrollList({
+			width:		 VIEW_MANAGER.__.base_width,
+            height:      36,
+            children:    _list,
+            scroll_axis: ScrollAxis.Horizontal,
+            size_mode:   ScrollListSizeMode.ScrollbarExcluded,
+        });
+        __.elements.equipment_left   = new UIPlaceholder({});
+        __.elements.containers_left  = new UIPlaceholder({});
+        __.elements.equipment_right  = new UIPlaceholder({});
+        __.elements.containers_right = new UIPlaceholder({});
+        __.elements.navbar           = new UIPlaceholder({});
+
+        // --- Inner row ---
+        var _row = new LayoutContainer({ direction: LayoutDirection.Horizontal });
         _row
-			.add_node({
+            .add_node(new LayoutNode({
                 element: __.elements.equipment_left,
-                width:   new LayoutSizeFixed({px: 73}),
-                height:  new LayoutSizeFill(),
-            })
-            .add_node({
+                size_x:  new LayoutFixed({ pixels: 73 }),
+                size_y:  new LayoutFill(),
+            }))
+            .add_node(new LayoutNode({
                 element: __.elements.containers_left,
-                width:   new LayoutSizeFill(),
-                height:  new LayoutSizeFill(),
-            })
-            .add_node({
+                size_x:  new LayoutFill(),
+                size_y:  new LayoutFill(),
+            }))
+            .add_node(new LayoutNode({
                 element: __.elements.equipment_right,
-                width:   new LayoutSizeFixed({px: 73}),
-                height:  new LayoutSizeFill(),
-            })
-            .add_node({
+                size_x:  new LayoutFixed({ pixels: 73 }),
+                size_y:  new LayoutFill(),
+            }))
+            .add_node(new LayoutNode({
                 element: __.elements.containers_right,
-                width:   new LayoutSizeFill(),
-                height:  new LayoutSizeFill(),
-            });
+                size_x:  new LayoutFill(),
+                size_y:  new LayoutFill(),
+            }));
 
         // --- Root layout ---
-        __.layout = new Layout({
-            axis:   LayoutAxis.Column,
-            x:      0,
-            y:      0,
-            width:  display_get_gui_width(),
-            height: display_get_gui_height(),
+        __.layout = new LayoutContainer({
+            direction: LayoutDirection.Vertical,
+            x:         0,
+            y:         0,
+            width:     display_get_gui_width(),
+            height:    display_get_gui_height(),
         });
         __.layout
-			.add_node({
+            .add_node(new LayoutNode({
                 element: __.elements.unit_list,
-                width:   new LayoutSizeFill(),
-                height:  new LayoutSizeHug(),
-            })
-            .add_node({
+                size_x:  new LayoutFill(),
+                size_y:  new LayoutContent(),
+                measure: function(_element) {
+                    return {
+                        width:  _element.get_width(),
+                        height: _element.get_height(),
+                    };
+                },
+            }))
+            .add_node(new LayoutNode({
                 element: _row,
-                width:   new LayoutSizeFill(),
-                height:  new LayoutSizeFill(),
-            })
-            .add_node({
+                size_x:  new LayoutFill(),
+                size_y:  new LayoutFill(),
+            }))
+            .add_node(new LayoutNode({
                 element: __.elements.navbar,
-                width:   new LayoutSizeFill(),
-                height:  new LayoutSizeFixed({px: 32}),
-            });
+                size_x:  new LayoutFill(),
+                size_y:  new LayoutFixed({ pixels: 32 }),
+            }));
 			
-		// Init elements that need it
-        __.elements.unit_list.init();
-    }
+		__.elements.unit_list.init();
 
+        __.layout.solve();
+    }
+	
     #endregion
 }

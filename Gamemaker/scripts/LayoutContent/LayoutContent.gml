@@ -7,33 +7,24 @@
 // |    \/_____/ \/_/\/_/ \/_____/ \/_____/ \/_____/   \/_/  |
 // |                                                         |
 // +---------------------------------------------------------+
-// class.LayoutSizeFixed
+// class.LayoutContent
 
-function LayoutSizeFixed(_config) constructor {
+function LayoutContent() constructor {
 	var _self = self;
-
-    #region Config
 	
-	// Public
+	#region Config
+	
 	#region Getters
 	
-    static get_px = function() { return __.px; }
-
-    #endregion
+	static get_type = function() { return __.type; }
+	
+	#endregion
 	
 	// Private
-	__ = {};
-	with (__) {
-        px = _config[$ "px"] ?? 0;
+    __ = {};
+    with (__) {
+        type = LayoutSizeType.Content;
     }
-
-    #endregion
-    #region Resolve
-
-    // Public
-    static resolve = function(_fill_unit = 0, _content_size = 0) {
-        return __.px;
-    }
-
-    #endregion
+	
+	#endregion
 }

@@ -46,7 +46,6 @@ function Scene(_config) constructor {
 	    if (__.layout == undefined) {
 	        show_error("Scene has not been built. Call build() before activate().", true);
 	    }
-	    __.layout.resolve();
 	    event_manager_publish(Event.ActivateScene, self);
 		event_manager_subscribe(Event.ViewResized, function(_config) {
 			__.layout.resize({
