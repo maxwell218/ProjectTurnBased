@@ -14,14 +14,19 @@ enum LayoutAxis {
     Column, // Children arranged vertically
 }
 
-function Layout(_config) : UIParent(_config) constructor {
+function Layout(_config) constructor {
 	var _self = self;
 
     #region Config
 
-    // Private
+    __ = {};
     with (__) {
-        axis          = _config[$ "axis"] ?? LayoutAxis.Column;
+        axis          = _config[$ "axis"   ] ?? LayoutAxis.Column;
+        x             = _config[$ "x"      ] ?? 0;
+        y             = _config[$ "y"      ] ?? 0;
+        width         = _config[$ "width"  ] ?? 0;
+        height        = _config[$ "height" ] ?? 0;
+        nodes		  = [];
         is_dirty      = false;
         dirty_node    = undefined;
         parent_layout = undefined;
@@ -32,9 +37,9 @@ function Layout(_config) : UIParent(_config) constructor {
 
     // Public
     static add_node = function(_config) {
-        var _node = new LayoutNode(_config, self);
-        array_push(__.children, _node);
-        return self;
+        var _node = new LayoutNode(_config);
+        array_push(__.nodes, _node);
+        return self; // chainable
     }
 
     #endregion
@@ -50,10 +55,10 @@ function Layout(_config) : UIParent(_config) constructor {
     }
 
     static resize = function(_config) {
-        __.x      = _config[$ "x"     ] ?? __.x;
-        __.y      = _config[$ "y"     ] ?? __.y;
-        __.width  = _config[$ "width" ] ?? __.width;
-        __.height = _config[$ "height"] ?? __.height;
+        __.x      = _config[$ "x"      ] ?? __.x;
+        __.y      = _config[$ "y"      ] ?? __.y;
+        __.width  = _config[$ "width"  ] ?? __.width;
+        __.height = _config[$ "height" ] ?? __.height;
         resolve();
     }
 
@@ -63,7 +68,6 @@ function Layout(_config) : UIParent(_config) constructor {
     // Public
     static mark_dirty = function(_node = undefined) {
         __.is_dirty = true;
-        // Track the first node that triggered dirty for reference
         if (_node != undefined && __.dirty_node == undefined) {
             __.dirty_node = _node;
         }
@@ -73,41 +77,12 @@ function Layout(_config) : UIParent(_config) constructor {
     }
 
     #endregion
-    #region Activate / Deactivate
-
-    // Public
-    static activate = function() {
-        if (__.parent_layout != undefined) {
-            show_error("Cannot activate a nested Layout directly, its lifecycle is managed by its parent Layout.", true);
-        }
-        if (__.is_dirty) {
-            resolve();
-        }
-        event_manager_publish(Event.AddUIRoot, self);
-        event_manager_subscribe(Event.WindowResized, on_window_resize);
-    }
-
-    static deactivate = function() {
-        if (__.parent_layout != undefined) {
-            show_error("Cannot deactivate a nested Layout directly, its lifecycle is managed by its parent Layout.", true);
-        }
-        event_manager_publish(Event.RemoveUIRoot, self);
-        event_manager_unsubscribe(Event.WindowResized);
-    }
-
-    static on_window_resize = function(_data) {
-        __.width  = _data.width;
-        __.height = _data.height;
-        resolve();
-    }
-
-    #endregion
     #region Resolve
 
     // Public
     static resolve = function() {
         var _is_row          = (__.axis == LayoutAxis.Row);
-        var _count           = array_length(__.children);
+        var _count           = array_length(__.nodes);
         var _main_available  = _is_row ? __.width  : __.height;
         var _cross_available = _is_row ? __.height : __.width;
         var _fill_total      = 0;
@@ -117,7 +92,7 @@ function Layout(_config) : UIParent(_config) constructor {
         // accumulate fill shares
 
         for (var _i = 0; _i < _count; _i++) {
-            var _node        = __.children[_i];
+            var _node        = __.nodes[_i];
             var _margin      = _node.get_margin();
             var _main_size   = _is_row ? _node.get_width() : _node.get_height();
             var _main_margin = _is_row ? _margin.get_horizontal() : _margin.get_vertical();
@@ -135,7 +110,7 @@ function Layout(_config) : UIParent(_config) constructor {
         // Fetch content size from each hug element, subtract from remaining space
 
         for (var _i = 0; _i < _count; _i++) {
-            var _node      = __.children[_i];
+            var _node      = __.nodes[_i];
             var _main_size = _is_row ? _node.get_width() : _node.get_height();
 
             if (instanceof(_main_size) == "LayoutSizeHug") {
@@ -145,33 +120,34 @@ function Layout(_config) : UIParent(_config) constructor {
         }
 
         // --- Pass 3: Compute fill unit ---
-
         var _fill_unit = (_fill_total > 0) ? (_main_available / _fill_total) : 0;
 
         // --- Commit: position and resize only changed nodes ---
-
         var _cursor = _is_row ? __.x : __.y;
 
         for (var _i = 0; _i < _count; _i++) {
-            var _node        = __.children[_i];
+            var _node        = __.nodes[_i];
             var _margin      = _node.get_margin();
             var _main_size   = _is_row ? _node.get_width()  : _node.get_height();
             var _cross_size  = _is_row ? _node.get_height() : _node.get_width();
             var _element     = _node.get_element();
 
-            var _main_margin_start  = _is_row ? _margin.get_left()    : _margin.get_top();
-            var _main_margin_end    = _is_row ? _margin.get_right()   : _margin.get_bottom();
-            var _cross_margin_start = _is_row ? _margin.get_top()     : _margin.get_left();
-            var _cross_margin_end   = _is_row ? _margin.get_bottom()  : _margin.get_right();
+            var _main_margin_start  = _is_row ? _margin.get_left()   : _margin.get_top();
+            var _main_margin_end    = _is_row ? _margin.get_right()  : _margin.get_bottom();
+            var _cross_margin_start = _is_row ? _margin.get_top()    : _margin.get_left();
+            var _cross_margin_end   = _is_row ? _margin.get_bottom() : _margin.get_right();
 
             // Gather content size once per node
-            var _needs_content  = (instanceof(_main_size) == "LayoutSizeHug" || instanceof(_cross_size) == "LayoutSizeHug");
-            var _content        = _needs_content ? _element.get_content_size() : undefined;
-            var _main_content   = (_content != undefined) ? (_is_row ? _content.width  : _content.height) : 0;
-            var _cross_content  = (_content != undefined) ? (_is_row ? _content.height : _content.width)  : 0;
+            var _needs_content = (instanceof(_main_size) == "LayoutSizeHug" || instanceof(_cross_size) == "LayoutSizeHug");
+            var _content       = _needs_content ? _element.get_content_size() : undefined;
+            var _main_content  = (_content != undefined) ? (_is_row ? _content.width  : _content.height) : 0;
+            var _cross_content = (_content != undefined) ? (_is_row ? _content.height : _content.width)  : 0;
+
+            // Cross fill unit is the full available cross space minus this node's margins
+            var _cross_fill_unit = _cross_available - _cross_margin_start - _cross_margin_end;
 
             var _resolved_main  = _main_size.resolve(_fill_unit, _main_content);
-            var _resolved_cross = _cross_size.resolve(_fill_unit, _cross_available - _cross_margin_start - _cross_margin_end);
+            var _resolved_cross = _cross_size.resolve(_cross_fill_unit, _cross_content);
 
             var _node_x = _is_row ? (_cursor + _main_margin_start) : (__.x + _cross_margin_start);
             var _node_y = _is_row ? (__.y    + _cross_margin_start) : (_cursor + _main_margin_start);
@@ -200,8 +176,8 @@ function Layout(_config) : UIParent(_config) constructor {
         }
 
         // Reset layout dirty state
-        __.is_dirty    = false;
-        __.dirty_node  = undefined;
+        __.is_dirty   = false;
+        __.dirty_node = undefined;
     }
 
     #endregion
@@ -213,10 +189,10 @@ function Layout(_config) : UIParent(_config) constructor {
             var _is_row = (__.axis == LayoutAxis.Row);
             var _main   = 0;
             var _cross  = 0;
-            var _count  = array_length(__.children);
+            var _count  = array_length(__.nodes);
 
             for (var _i = 0; _i < _count; _i++) {
-                var _node         = __.children[_i];
+                var _node         = __.nodes[_i];
                 var _margin       = _node.get_margin();
                 var _main_size    = _is_row ? _node.get_width()  : _node.get_height();
                 var _cross_size   = _is_row ? _node.get_height() : _node.get_width();
@@ -228,6 +204,8 @@ function Layout(_config) : UIParent(_config) constructor {
                 var _main_content  = (_content != undefined) ? (_is_row ? _content.width  : _content.height) : 0;
                 var _cross_content = (_content != undefined) ? (_is_row ? _content.height : _content.width)  : 0;
 
+                // For measure, cross Fill resolves to 0 since we have no cross constraint here —
+                // cross Hug resolves to content, cross Fixed resolves to px
                 _main  += _main_margin  + _main_size.resolve(0, _main_content);
                 _cross  = max(_cross, _cross_margin + _cross_size.resolve(0, _cross_content));
             }
@@ -237,14 +215,6 @@ function Layout(_config) : UIParent(_config) constructor {
                 height: _is_row ? _cross : _main,
             };
         }
-    }
-
-    #endregion
-    #region Cleanup
-
-    // Public
-    static cleanup = function() {
-        // nothing to free yet — surfaces live on individual UI elements
     }
 
     #endregion

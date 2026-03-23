@@ -48,6 +48,19 @@ event_manager_publish(Event.AddUIRoot, health_ui_panel);
 
 depth = DepthTable.UI;
 
+scene_inventory = new SceneInventory({});
+scene_inventory.build();
+scene_inventory.activate();
+
+var _e = scene_inventory.get_elements();
+var _names = variable_struct_get_names(_e);
+for (var _i = 0; _i < array_length(_names); _i++) {
+    var _el = _e[$ _names[_i]];
+    show_debug_message(_names[_i] + ": x=" + string(_el.__.x) + " y=" + string(_el.__.y) + " w=" + string(_el.__.width) + " h=" + string(_el.__.height));
+}
+
+show_debug_message(display_get_gui_width() * VIEW_MANAGER.get_scale());
+show_debug_message(display_get_gui_height() * VIEW_MANAGER.get_scale());
 //stat = new StatusBar({
 //	x: 12,
 //	y: 48,
@@ -55,9 +68,9 @@ depth = DepthTable.UI;
 //	height: 5,
 //});
 
-stat_value = 0;
+//stat_value = 0;
 
-list1 = array_create(20);
+//list1 = array_create(20);
 
 //list = new ScrollList({
 //	x: 0,
@@ -70,29 +83,29 @@ list1 = array_create(20);
 //	children: list1,
 //});
 
-list = new ScrollList({
-	x: 0,
-	y: 0,
-	width: 200,
-	height: 200,
-	padding: 5,
-	scroll_axis: ScrollAxis.Vertical,
-	size_mode: ScrollListSizeMode.PushLayout,
-	children: list1,
-});
+//list = new ScrollList({
+//	x: 0,
+//	y: 0,
+//	width: 200,
+//	height: 200,
+//	padding: 5,
+//	scroll_axis: ScrollAxis.Vertical,
+//	size_mode: ScrollListSizeMode.PushLayout,
+//	children: list1,
+//});
 
-list.init();
+//list.init();
 
-health_ui_panel = new Panel({
-	x: 0,
-	y: 0,
-	width: 480,
-	height: 200,
-	children: [list],
-});
+//health_ui_panel = new Panel({
+//	x: 0,
+//	y: 0,
+//	width: 480,
+//	height: 200,
+//	children: [list],
+//});
 
-#region Events
+//#region Events
 
-event_manager_publish(Event.AddUIRoot, health_ui_panel);
+//event_manager_publish(Event.AddUIRoot, health_ui_panel);
 
-#endregion
+//#endregion

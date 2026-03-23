@@ -32,6 +32,9 @@ function UIElement(_config) constructor {
 	static get_is_hovered = function() {
 		return __.is_hovered;
 	}
+	static get_content_size = function() {
+		return { width: __.width, height: __.height };
+	}
 	
 	#endregion
 	#region Setters
@@ -66,6 +69,16 @@ function UIElement(_config) constructor {
 	
 		is_hovered = _config[$ "is_hovered" ] ?? false;
 	}
+	
+	#endregion
+	#region Resize
+	
+	static resize = function(_config) {
+        __.x      = _config[$ "x"     ] ?? __.x;
+        __.y      = _config[$ "y"     ] ?? __.y;
+        __.width  = _config[$ "width" ] ?? __.width;
+        __.height = _config[$ "height"] ?? __.height;
+    }
 	
 	#endregion
 }

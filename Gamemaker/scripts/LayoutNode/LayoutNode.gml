@@ -1,15 +1,16 @@
-// +-----------------------------------------------------------+
-// |                                                           |
-// |   ______   ______   ______   ______   __       __         |
-// |  /\  ___\ /\  ___\ /\  == \ /\  __ \ /\ \     /\ \        |
-// |  \ \___  \\ \ \____\ \  __< \ \ \/\ \\ \ \____\ \ \____   |
-// |   \/\_____\\ \_____\\ \_\ \_\\ \_____\\ \_____\\ \_____/  |
-// |    \/_____/ \/_____/ \/_/ /_/ \/_____/ \/_____/ \/_____/  |
-// |                                                           |
-// +-----------------------------------------------------------+
+// +---------------------------------------------------------+
+// |                                                         |
+// |   __       ______   __  __   ______   __  __   ______   |
+// |  /\ \     /\  __ \ /\ \_\ \ /\  __ \ /\ \/\ \ /\__  _\  |
+// |  \ \ \____\ \  __ \\ \____ \\ \ \/\ \\ \ \_\ \\/_/\ \/  |
+// |   \ \_____\\ \_\ \_\\/\_____\\ \_____\\ \_____\  \ \_\  |
+// |    \/_____/ \/_/\/_/ \/_____/ \/_____/ \/_____/   \/_/  |
+// |                                                         |
+// +---------------------------------------------------------+
 // class.LayoutNode
 
-function LayoutNode(_config, _parent_layout) constructor {
+function LayoutNode(_config) constructor {
+	var _self = self;
 
     #region Config
 	
@@ -31,24 +32,18 @@ function LayoutNode(_config, _parent_layout) constructor {
 	// Private
     __ = {};
     with (__) {
-        element        = _config[$ "element"];
-        width          = _config[$ "width"  ] ?? new LayoutSizeFill();
-        height         = _config[$ "height" ] ?? new LayoutSizeFill();
-        margin         = new LayoutMargin(_config[$ "margin"] ?? 0);
-        parent_layout  = _parent_layout;
-        is_dirty       = true; // dirty by default so first resolve always commits
+        element				= _config[$ "element"];
+        width				= _config[$ "width"  ] ?? new LayoutSizeFill();
+        height				= _config[$ "height" ] ?? new LayoutSizeFill();
+        margin				= new LayoutMargin(_config[$ "margin"] ?? 0);
+        parent_layout		= _config[$ "parent_layout"];
+        is_dirty			= true;
 
         // Cached resolved values — undefined until first resolve
         resolved_x      = undefined;
         resolved_y      = undefined;
         resolved_width  = undefined;
         resolved_height = undefined;
-    }
-
-    // Inject dirty callback onto element without coupling element to layout
-    var _node = self;
-    element.on_dirty = function() {
-        _node.mark_dirty();
     }
 
     #endregion
@@ -67,14 +62,6 @@ function LayoutNode(_config, _parent_layout) constructor {
         __.resolved_y      = _y;
         __.resolved_width  = _width;
         __.resolved_height = _height;
-    }
-
-    #endregion
-    #region Hover
-
-    // Public
-    static collect_hover = function(_mouse_x, _mouse_y, _hovered_stack, _context = {}) {
-        return __.element.collect_hover(_mouse_x, _mouse_y, _hovered_stack, _context);
     }
 
     #endregion

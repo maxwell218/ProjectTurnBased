@@ -7,7 +7,11 @@
 // |    \/_____/ \/_/  |
 // |                   |
 // +-------------------+
-// obj_ui_manager.draw_gui
+// class.UIPlaceholder
 
-render();
-render_gui();
+function UIPlaceholder(_config) : UIChild(_config) constructor {
+	
+	static render = function() {
+		draw_sprite_stretched(spr_ui_bg, 0, __.x, __.y, __.width, __.height);	
+	}
+}

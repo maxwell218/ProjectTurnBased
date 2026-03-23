@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"SceneInventory",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"SceneInventory",
+  "parent":{
+    "name":"Scene",
+    "path":"folders/Scripts/UI/Element/Scene.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -10,6 +10,7 @@
 // class.LayoutMargin
 
 function LayoutMargin(_config) constructor {
+	var _self = self;
 
     #region Config
 	

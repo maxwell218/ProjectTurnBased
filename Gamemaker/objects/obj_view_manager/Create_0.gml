@@ -25,20 +25,18 @@ global.view_manager = id;
 // Private
 __ = {};
 with (__) {
-	
 	// Base game dimensions
 	base_width  = _self[$ "base_width" ] ?? 480;
 	base_height = _self[$ "base_height"] ?? 270;
-	
-	// Offsets
-	offset_x = _self[$ "offset_x" ] ?? 0;
-	offset_y = _self[$ "offset_y" ] ?? 0;
 	
 	// Viewport and window dimensions
 	viewport_width  = _self[$ "viewport_width" ] ?? 0;
 	viewport_height = _self[$ "viewport_height"] ?? 0;
 	window_width 	= _self[$ "window_width"   ] ?? 0;
 	window_height   = _self[$ "window_height"  ] ?? 0;
+	
+	offset_x = 0;
+	offset_y = 0;
 	
 	// Scale factor
 	scale = _self[$ "scale"] ?? 1;
@@ -86,17 +84,21 @@ check_window_resize = function() {
 			_is_resize = true;
 		}
 	}
+	
 	if (_is_resize) {
-		// Window resize event
-		event_manager_publish(Event.WindowResized, [_w, _h]);
+		// Window resized event
+		event_manager_publish(Event.WindowResized, {
+			width: _w,
+			height: _h
+		});
 	}
 }
 
 // Private
 with (__) {
-	handle_resize = method(_self, function(_size) {
-		__.window_width = _size[0];
-		__.window_height = _size[1];
+	handle_resize = method(_self, function(_config) {
+		__.window_width  = _config[$ "width" ] ?? undefined;
+		__.window_height = _config[$ "height"] ?? undefined;
 		
 		__.calculate_scale();
 	});
@@ -124,23 +126,23 @@ with (__) {
         window_set_fullscreen(__.is_fullscreen);
 		
         if (__.is_fullscreen) {
-			
-			// TODO Store previous window position
-			
             // Store windowed size before going fullscreen
             __.window_width = display_get_width();
             __.window_height = display_get_height();
-			
         } else {
-			
             // Restore windowed size (you can customize these defaults)
             __.window_width = __.base_width * 3; // Default 1920x1080 scaled
             __.window_height = __.base_height * 3;
 			
-            window_set_rectangle(0, 0, __.window_width, __.window_height);
+			var _wx = (display_get_width() div 2) - (__.window_width div 2);
+			var _wy = (display_get_height() div 2) - (__.window_height div 2);
+            window_set_rectangle(_wx, _wy, __.window_width, __.window_height);
         }
 		
-        __.handle_resize([__.window_width, __.window_height]);
+		event_manager_publish(Event.WindowResized, {
+			width: __.window_width,
+			height: __.window_height
+		});
 	});
 }
 
@@ -155,30 +157,63 @@ get_scale = function() {
 // Private
 with (__) {
 	calculate_scale = method(_self, function() {
-
 	    var _h_scale = floor(__.window_width  / __.base_width);
 	    var _v_scale = floor(__.window_height / __.base_height);
 	    __.scale = max(min(_h_scale, _v_scale), 1);
-	
-	    // expand to consume ALL remaining pixels — ceil ensures we cover the window fully
-	    var _expanded_w = ceil(__.window_width  / __.scale);
-	    var _expanded_h = ceil(__.window_height / __.scale);
-	
-	    // No remainder — expanded * scale >= window always
-	    __.offset_x = 0;
-	    __.offset_y = 0;
-	
+
+	    // Expand to GUI dimensions
+	    var _expanded_w = floor(__.window_width  / __.scale);
+	    var _expanded_h = floor(__.window_height / __.scale);
+
+	    // Optional: keep these even if your game logic really needs it
+	    _expanded_w -= (_expanded_w mod 2);
+	    _expanded_h -= (_expanded_h mod 2);
+
+	    // Port size in window pixels
+	    var _port_w = _expanded_w * __.scale;
+	    var _port_h = _expanded_h * __.scale;
+
+	    // Actual remainder
+	    var _remainder_x = __.window_width  - _port_w;
+	    var _remainder_y = __.window_height - _port_h;
+
+	    // Center normally
+	    var _port_x = _remainder_x div 2;
+	    var _port_y = _remainder_y div 2;
+
+	    __.offset_x = _port_x;
+	    __.offset_y = _port_y;
+
 	    surface_resize(application_surface, _expanded_w, _expanded_h);
 	    display_set_gui_size(_expanded_w, _expanded_h);
-	
 	    camera_set_view_size(view_camera[0], _expanded_w, _expanded_h);
-		
-		// Port fills the entire window — GUI and app surface are identical
-	    view_set_wport(0, __.window_width);
-	    view_set_hport(0, __.window_height);
-	    view_set_xport(0, 0);
-	    view_set_yport(0, 0);
+
+	    view_set_wport(0, _port_w);
+	    view_set_hport(0, _port_h);
+	    view_set_xport(0, _port_x);
+	    view_set_yport(0, _port_y);
+
+	    event_manager_publish(Event.ViewResized, {
+	        width:  _expanded_w,
+	        height: _expanded_h,
+	    });
 	});
+}
+
+#endregion
+#region Render
+
+// Public
+render_gui = function() {
+	if (global.debug) {
+		draw_set_halign(fa_right);	
+		draw_set_valign(fa_bottom);
+		var _x = camera_get_view_width(view_camera[0]);
+		var _y = camera_get_view_height(view_camera[0]);
+		var _offset = 8;
+		draw_text(_x, _y - _offset * 1, "App size: " + string(surface_get_width(application_surface)) + ", " + string(surface_get_height(application_surface)));
+		draw_text(_x, _y - _offset * 0, "Window size: " + string(window_get_width()) + ", " + string(window_get_height()));
+	}
 }
 
 #endregion

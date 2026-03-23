@@ -23,14 +23,28 @@ enum ScrollListBorderStyle {
 }
 enum ScrollListSizeMode {
     ShrinkContent, // List size is fixed, items shrink by scrollbar_thickness when bar appears
-    ReservedBar,   // List size is fixed, items are always scrollbar_thickness smaller, track always rendered
-    PushLayout,    // Item area is fixed, list grows by scrollbar_thickness when bar appears, marks parent layout dirty
+    PushContent,    // Item area is fixed, list grows by scrollbar_thickness when bar appears, marks parent layout dirty
 }
 
 function ScrollList(_config) : UIParent(_config) constructor {
     var _self = self;
 
     #region Config
+	
+	// Public
+	static get_content_size = function() {
+	    var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
+	    var _w = __.width;
+	    var _h = __.height;
+	    if (__.size_mode == ScrollListSizeMode.PushContent && __.scrollbar_needed) {
+	        if (_is_vertical) {
+	            _w += __.scrollbar_thickness;
+	        } else {
+	            _h += __.scrollbar_thickness;
+	        }
+	    }
+	    return { width: _w, height: _h };
+	}
 
     // Private
     with (__) {
@@ -66,12 +80,8 @@ function ScrollList(_config) : UIParent(_config) constructor {
         content_size  = 0;
         surface       = -1;
 
-        // Overflow state — used by PushLayout to detect changes
+        // Overflow state — used by PushContent to detect changes
         has_scrollbar = false;
-		
-		// Optional dirty callback — injected by LayoutNode if this element
-        // is wrapped in a layout. Not set means element is used standalone.
-        on_dirty = undefined;
 
         // Visible-child culling
         child_draw_start  = 0;
@@ -221,7 +231,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
         // --- Pass 1: Measure ---
         // Position children along the main axis, compute total content_size.
         // Cross-axis size is set here based on size_mode — ShrinkContent starts
-        // at full width and may shrink in pass 2, ReservedBar and PushLayout
+        // at full width and may shrink in pass 2, PushContent
         // set their final cross-axis size now and never change it.
 
         var _cross_size = _is_vertical ? __.width : __.height;
@@ -231,11 +241,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
                 // Items start at full cross size, may shrink in pass 2 if overflow detected
                 _cross_size = (_is_vertical ? __.width : __.height) - __.padding * 2;
                 break;
-            case ScrollListSizeMode.ReservedBar:
-                // Items always reserve room for the scrollbar regardless of overflow
-                _cross_size = (_is_vertical ? __.width : __.height) - __.padding * 2 - __.scrollbar_thickness;
-                break;
-            case ScrollListSizeMode.PushLayout:
+            case ScrollListSizeMode.PushContent:
                 // Items always take full cross size — list grows outward if bar appears
                 _cross_size = (_is_vertical ? __.width : __.height) - __.padding * 2;
                 break;
@@ -277,16 +283,10 @@ function ScrollList(_config) : UIParent(_config) constructor {
                     }
                 }
                 break;
-            case ScrollListSizeMode.ReservedBar:
-                // Nothing to do — items were already sized for the scrollbar in pass 1
-                break;
-	        case ScrollListSizeMode.PushLayout:
-				// PushLayout case — notify layout if overflow state changed
+	        case ScrollListSizeMode.PushContent:
+				// PushContent case — notify layout if overflow state changed
 	            if (__.scrollbar_needed != __.has_scrollbar) {
 	                __.has_scrollbar = __.scrollbar_needed;
-	                if (__.on_dirty != undefined) {
-	                    __.on_dirty();
-	                }
 	            }
 	            break;
         }
@@ -332,9 +332,8 @@ function ScrollList(_config) : UIParent(_config) constructor {
             _hovered_child.render_hover(_context);
         }
 
-        // Scrollbar — rendered for ReservedBar even when not overflowing (empty track)
-        var _render_scrollbar = __.scrollbar_needed
-            || (__.size_mode == ScrollListSizeMode.ReservedBar);
+        // Scrollbar — rendered when overflowed
+        var _render_scrollbar = __.scrollbar_needed;
 
         if (_render_scrollbar) {
             var _thumb_size = __get_thumb_size();
@@ -385,7 +384,6 @@ function ScrollList(_config) : UIParent(_config) constructor {
         surface_reset_target();
         draw_surface(__.surface, __.x, __.y);
     }
-
     static render_gui = function() {
         if (global.debug) {
             draw_set_halign(fa_left);
@@ -422,8 +420,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
             var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
             var _view_size   = _is_vertical ? __.height : __.width;
 
-            if (__.size_mode != ScrollListSizeMode.ReservedBar
-            &&  __.content_size <= _view_size) return false;
+            if (__.content_size <= _view_size) return false;
 
             var _mx = _mouse_x - __.x;
             var _my = _mouse_y - __.y;

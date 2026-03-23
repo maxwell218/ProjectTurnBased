@@ -9,7 +9,7 @@
 // +---------------------------------------------------------+
 // class.LayoutSizeFill
 
-function LayoutSizeFill(_config) constructor {
+function LayoutSizeFill(_config = {}) constructor {
 	var _self = self;
 	
     #region Config
@@ -32,7 +32,7 @@ function LayoutSizeFill(_config) constructor {
 
     // Public
     static resolve = function(_fill_unit = 0, _content_size = 0) {
-        return floor(__.share * _fill_unit);
+        return round(__.share * _fill_unit);
     }
 
     #endregion

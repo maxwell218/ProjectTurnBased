@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Scene",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Scene",
+  "parent":{
+    "name":"Scene",
+    "path":"folders/Scripts/UI/Element/Scene.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
