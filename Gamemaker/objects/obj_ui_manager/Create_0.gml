@@ -9,6 +9,7 @@
 // +-------------------+
 // obj_ui_manager.create
 
+depth = DepthTable.UI;
 var _self = self;
 
 #region Singleton
@@ -23,14 +24,25 @@ global.ui_manager = id;
 #region Config
 
 // Public
-depth = DepthTable.UI;
+#region Getters
+
 get_active_element = function() {
     return __.active_element;
 }
+get_ui_format = function() {
+	return __.ui_format;
+}
+
+#endregion
 
 // Private
 __ = {};
 with (__) {
+	ui_format = new UIFormat({
+		content_inset: 0,
+		item_spacing: 0,
+		border_mode: UIBorderMode.SharedEdge,
+	});
     active_scene  = undefined; // single active scene
     modal_stack   = [];        // modals layered on top, last is top-most
 

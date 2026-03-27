@@ -28,7 +28,6 @@ function LayoutContainer(_config) constructor {
         width     = _config[$ "width"    ] ?? 0;
         height    = _config[$ "height"   ] ?? 0;
         direction = _config[$ "direction"] ?? LayoutDirection.Vertical;
-        gap       = _config[$ "gap"      ] ?? 0;
 
         var _m  = _config[$ "margin"] ?? 0;
         margin  = is_real(_m) ? new LayoutMargin(_m) : _m;
@@ -71,8 +70,7 @@ function LayoutContainer(_config) constructor {
         //            resolve cross axis fully,
         //            accumulate consumed space and fill weight ──
 
-        var _gap_total         = max(0, _count - 1) * __.gap;
-        var _consumed          = _gap_total;
+        var _consumed          = 0;
         var _total_fill_weight = 0;
 
         var _main_sizes  = array_create(_count, 0);
@@ -97,8 +95,12 @@ function LayoutContainer(_config) constructor {
                     _cross_sizes[_i] = (_is_h ? _inner_h : _inner_w) - _cross_margin;
                     break;
                 case LayoutSizeType.Content:
-                    var _measured    = _node.get_content_size();
-                    _cross_sizes[_i] = _is_h ? _measured.height : _measured.width;
+                    var _offered_cross = (_is_h ? _inner_h : _inner_w) - _cross_margin;
+					var _measured = _node.get_content_size(
+					    _is_h ? 0 : _offered_cross,
+					    _is_h ? _offered_cross : 0
+					);
+					_cross_sizes[_i] = _is_h ? _measured.height : _measured.width;
                     break;
             }
 
@@ -114,8 +116,12 @@ function LayoutContainer(_config) constructor {
                     _consumed         += _main_margin;
                     break;
                 case LayoutSizeType.Content:
-                    var _measured    = _node.get_content_size();
-                    _main_sizes[_i]  = _is_h ? _measured.width : _measured.height;
+                    var _offered_cross = _cross_sizes[_i];
+					var _measured = _node.get_content_size(
+					    _is_h ? 0 : _offered_cross,
+					    _is_h ? _offered_cross : 0
+					);
+					_main_sizes[_i] = _is_h ? _measured.width : _measured.height;
                     _consumed       += _main_sizes[_i] + _main_margin;
                     break;
             }
@@ -156,8 +162,7 @@ function LayoutContainer(_config) constructor {
 
             _node.apply_resolved(_nx, _ny, _w, _h);
 
-            _cursor += _main_sizes[_i] + _main_start + _main_end
-                     + ((_i < _count - 1) ? __.gap : 0);
+            _cursor += _main_sizes[_i] + _main_start + _main_end;
         }
     }
 }

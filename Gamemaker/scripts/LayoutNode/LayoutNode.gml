@@ -47,12 +47,12 @@ function LayoutNode(_config) constructor {
     }
 
     // Invoked by LayoutContainer — calls the measure callback if present
-    static get_content_size = function() {
-        if (__.measure == undefined) {
-            show_error("LayoutNode: LayoutContent used but no measure callback provided.", true);
-        }
-        return __.measure(__.element);
-    }
+    static get_content_size = function(_available_w, _available_h) {
+	    if (__.measure == undefined) {
+	        show_error("LayoutNode: LayoutContent used but no measure callback provided.", true);
+	    }
+	    return __.measure(__.element, _available_w, _available_h);
+	}
 
     // Pushes the solved rect back into the wrapped element
     static apply_resolved = function(_x, _y, _w, _h) {

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"UIFormat",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"UIFormat",
+  "parent":{
+    "name":"Base",
+    "path":"folders/Scripts/UI/Base.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

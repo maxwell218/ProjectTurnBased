@@ -160,6 +160,8 @@ with (__) {
 	    var _h_scale = floor(__.window_width  / __.base_width);
 	    var _v_scale = floor(__.window_height / __.base_height);
 	    __.scale = max(min(_h_scale, _v_scale), 1);
+		// TODO Proper scale clamping
+		// __.scale = clamp(__.scale, 2, 3);
 
 	    // Expand to GUI dimensions
 	    var _expanded_w = floor(__.window_width  / __.scale);
@@ -211,6 +213,8 @@ render_gui = function() {
 		var _x = camera_get_view_width(view_camera[0]);
 		var _y = camera_get_view_height(view_camera[0]);
 		var _offset = 8;
+		draw_text(_x, _y - _offset * 3, "Gui pos: " + string(__.offset_x) + ", " + string(__.offset_y));
+		draw_text(_x, _y - _offset * 2, "Gui size: " + string(display_get_gui_width()) + ", " + string(display_get_gui_height()));
 		draw_text(_x, _y - _offset * 1, "App size: " + string(surface_get_width(application_surface)) + ", " + string(surface_get_height(application_surface)));
 		draw_text(_x, _y - _offset * 0, "Window size: " + string(window_get_width()) + ", " + string(window_get_height()));
 	}

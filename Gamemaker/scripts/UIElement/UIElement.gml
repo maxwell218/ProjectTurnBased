@@ -61,13 +61,16 @@ function UIElement(_config) constructor {
 	__ = {}
 	with (__) {
 		// Position and size
-		x = _config[$ "x"] ?? undefined;
-		y = _config[$ "y"] ?? undefined;
+		x = _config[$ "x"] ?? 0;
+		y = _config[$ "y"] ?? 0;
+		width  = _config[$ "width" ] ?? 0;
+        height = _config[$ "height"] ?? 0;
 	
-		width  = _config[$ "width" ] ?? undefined;
-        height = _config[$ "height"] ?? undefined;
-	
+		// Hovered state
 		is_hovered = _config[$ "is_hovered" ] ?? false;
+		
+		// Format
+		ui_format = _config[$ "ui_format"] ?? UI_MANAGER.get_ui_format();
 	}
 	
 	#endregion

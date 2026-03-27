@@ -59,7 +59,7 @@ function StatusBar(_config = {}) constructor {
 	#region Render
 
 	// Public
-	static render = function(_stat_previous, _stat_current, _stat_max, _event_number) {	
+	static render = function(_stat_previous, _stat_current, _stat_max, _event_number = undefined) {	
 		// Draw border
 		draw_sprite_stretched(spr_stat_bar_border, 0, __.x, __.y, __.width, __.height);
 		
@@ -70,6 +70,9 @@ function StatusBar(_config = {}) constructor {
         var _color  = __get_stat_color(_pct);
         var _bright = COLORS.color_to_rgb(_color[0]);
         var _dark   = COLORS.color_to_rgb(_color[1]);
+		if (_event_number == undefined) {
+			_event_number = event_number;	
+		}
 		var _scale  = (_event_number == ev_gui) ? VIEW_MANAGER.get_scale() : 1;
 		
 		var _x = __.inner_x;

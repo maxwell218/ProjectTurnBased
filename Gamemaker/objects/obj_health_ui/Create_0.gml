@@ -52,23 +52,6 @@ scene_inventory = new SceneInventory({});
 scene_inventory.build();
 scene_inventory.activate();
 
-var _e = scene_inventory.get_elements();
-var _names = variable_struct_get_names(_e);
-for (var _i = 0; _i < array_length(_names); _i++) {
-    var _el = _e[$ _names[_i]];
-    show_debug_message(_names[_i] + ": x=" + string(_el.__.x) + " y=" + string(_el.__.y) + " w=" + string(_el.__.width) + " h=" + string(_el.__.height));
-}
-
-
-var _l = scene_inventory.get_layout();
-var _nodes = _l.__.nodes;
-for (var _i = 0; _i < array_length(_nodes); _i++) {
-    var _el = _nodes[_i];
-    show_debug_message(_names[_i] + ": x=" + string(_el.get_resolved_x()) + " y=" + string(_el.get_resolved_y()) + " w=" + string(_el.get_resolved_width()) + " h=" + string(_el.get_resolved_height()));
-}
-
-show_debug_message(display_get_gui_width() * VIEW_MANAGER.get_scale());
-show_debug_message(display_get_gui_height() * VIEW_MANAGER.get_scale());
 //stat = new StatusBar({
 //	x: 12,
 //	y: 48,

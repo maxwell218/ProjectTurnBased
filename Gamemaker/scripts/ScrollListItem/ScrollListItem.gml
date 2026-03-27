@@ -39,15 +39,14 @@ function ScrollListItem(_config) : UIChild(_config) constructor {
 	static render = function(_context) {
 		var _x = round(__.x - _context.scroll_x);
 		var _y = round(__.y - _context.scroll_y);
-		var _b_style = _context.border_style;
-		// var _b_color;
+		var _border_mode = _context.border_mode;
 		
 		// Draw background
 		draw_set_color(c_gray);
-		draw_rectangle(_x, _y, _x + __.width, _y + __.height, false);
+		draw_rectangle(_x + 1, _y + 1, _x - 1 + __.width - 1, _y - 1 + __.height - 1, false);
 		
 		// Draw borders
-		__render_border(_context, c_blue);
+		if (_border_mode != UIBorderMode.None) __render_borders(_context, c_blue);
 		
 		draw_set_color(c_white);
 		// TODO Custom text centering
@@ -56,27 +55,18 @@ function ScrollListItem(_config) : UIChild(_config) constructor {
 		draw_text(_x + __.width div 2, _y + __.height div 2, string(__.item));
 	}
 	static render_hover = function(_context) {
-		__render_border(_context, c_white);
+		__render_borders(_context, c_white);
 	}
 	
 	// Private
 	with (__) {
-		static __render_border = function(_context, _color) {
+		static __render_borders = function(_context, _color) {
 			var _axis = _context.scroll_axis;
 			var _x = round(__.x - _context.scroll_x);
 			var _y = round(__.y - _context.scroll_y);
-			var _b_style = _context.border_style;
 		
 			draw_set_color(_color);
-			if (_b_style == ScrollListBorderStyle.Shared) {
-				if (_axis == ScrollAxis.Vertical) {
-					draw_rectangle(_x + 1, _y + 1, _x + __.width - 1, _y + __.height, true);
-				} else {
-					draw_rectangle(_x + 1, _y + 1, _x + __.width, _y + __.height - 1, true);
-				}
-			} else {
-				draw_rectangle(_x + 1, _y + 1, _x + __.width - 1, _y + __.height - 1, true);
-			}
+			draw_rectangle(_x + 1, _y + 1, _x - 1 + __.width - 1, _y - 1 + __.height - 1, true);
 		}
 	}
 	

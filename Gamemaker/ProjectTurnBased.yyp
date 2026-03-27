@@ -52,7 +52,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.1400.4.1023",
+    "IDEVersion":"2024.1400.4.1030",
   },
   "name":"ProjectTurnBased",
   "resources":[
@@ -103,6 +103,7 @@
     {"id":{"name":"StatusBar","path":"scripts/StatusBar/StatusBar.yy",},},
     {"id":{"name":"UIChild","path":"scripts/UIChild/UIChild.yy",},},
     {"id":{"name":"UIElement","path":"scripts/UIElement/UIElement.yy",},},
+    {"id":{"name":"UIFormat","path":"scripts/UIFormat/UIFormat.yy",},},
     {"id":{"name":"UIParent","path":"scripts/UIParent/UIParent.yy",},},
     {"id":{"name":"UIPlaceholder","path":"scripts/UIPlaceholder/UIPlaceholder.yy",},},
     {"id":{"name":"shd_bar","path":"shaders/shd_bar/shd_bar.yy",},},
@@ -117,6 +118,7 @@
     {"id":{"name":"spr_stat_bar_border","path":"sprites/spr_stat_bar_border/spr_stat_bar_border.yy",},},
     {"id":{"name":"spr_stat_bar_fill","path":"sprites/spr_stat_bar_fill/spr_stat_bar_fill.yy",},},
     {"id":{"name":"spr_ui_bg","path":"sprites/spr_ui_bg/spr_ui_bg.yy",},},
+    {"id":{"name":"spr_ui_borders","path":"sprites/spr_ui_borders/spr_ui_borders.yy",},},
   ],
   "resourceType":"GMProject",
   "resourceVersion":"2.0",

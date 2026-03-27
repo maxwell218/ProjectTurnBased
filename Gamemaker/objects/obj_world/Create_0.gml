@@ -5,8 +5,8 @@
 #macro HEX_HEIGHT sprite_get_height(spr_hex_tile)
 #macro HEX_WIDTH sprite_get_width(spr_hex_tile)
 
-#macro BUFFER_ROWS 2
-#macro BUFFER_COLS 2
+#macro BUFFER_ROWS 3
+#macro BUFFER_COLS 3
 
 #macro COL_SPACING HEX_WIDTH * 3/4
 #macro HALF_HEX_HEIGHT HEX_HEIGHT div 2
@@ -117,7 +117,9 @@ get_hex_distance = function(_hex_a, _hex_b) {
     return max(_dx, _dy, _dz);
 }
 
-init_pool_for_camera = function() {
+init_pool_for_camera = function(_data = {}) {
+	
+	destroy_pool();
 	
     var _cam = view_camera[0];
     var _vx  = camera_get_view_x(_cam);
@@ -126,8 +128,8 @@ init_pool_for_camera = function() {
     var _vh  = camera_get_view_height(_cam);
 
     // How many tiles are visible in camera (+1 for partial / stagger)
-	var _visible_rows = ceil(_vh / HEX_HEIGHT) + 1 + BUFFER_ROWS;
-	var _visible_cols = ceil(_vw / (COL_SPACING)) + 1 + BUFFER_COLS;
+	var _visible_rows = ceil(_vh / HEX_HEIGHT) + BUFFER_ROWS;
+	var _visible_cols = ceil(_vw / (COL_SPACING)) + BUFFER_COLS;
 	
 	pool_rows = min(_visible_rows, WORLD_HEIGHT);
 	pool_cols = min(_visible_cols, WORLD_WIDTH);
@@ -379,21 +381,22 @@ on_hex_click = function() {
 
 draw_tiles_in_view = function() {
 	
-	var _tiles_to_draw = [];
+	// var _tiles_to_draw = [];
 
     // Collect all visible pool tiles (not world_data, just the pool)
     for (var _r = 0; _r < pool_rows; _r++) {
         for (var _c = 0; _c < pool_cols; _c++) {
             var _inst = pool[_r][_c];
-            array_push(_tiles_to_draw, _inst);
+            // array_push(_tiles_to_draw, _inst);
+			_inst.draw();
         }
     }
 
     // Sort tiles by Y (then X as tiebreaker)
-    array_sort(_tiles_to_draw, function(a, b) {
-        if (a.y == b.y) return a.x - b.x;
-        return a.y - b.y;
-    });
+    //array_sort(_tiles_to_draw, function(a, b) {
+    //    if (a.y == b.y) return a.x - b.x;
+    //    return a.y - b.y;
+    //});
 	
 	/*
 	
@@ -453,10 +456,18 @@ draw_tiles_in_view = function() {
 	*/
 	
     // Draw them in sorted order
-    for (var i = 0; i < array_length(_tiles_to_draw); i++) {
-        var _tile = _tiles_to_draw[i];
-        with (_tile) draw();
-    }
+    //for (var i = 0; i < array_length(_tiles_to_draw); i++) {
+    //    var _tile = _tiles_to_draw[i];
+    //    with (_tile) draw();
+    //}
+}
+
+destroy_pool = function() {
+	for (var _i = 0; _i < pool_rows; _i++) {
+		for (var _j = 0; _j < pool_cols; _j++) {
+			instance_destroy(pool[_i][_j]);	
+		}
+	}
 }
 
 #endregion
@@ -491,6 +502,8 @@ anchor_col = 0;
 #endregion
 
 #region Events
+
+event_manager_subscribe(Event.ViewResized, init_pool_for_camera);
 
 event_manager_subscribe(Event.GameNew, function() {
 	

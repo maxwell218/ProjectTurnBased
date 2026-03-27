@@ -30,12 +30,7 @@ function LayoutMargin(_config) constructor {
 	// Private
 	__ = {};
     with (__) {
-        if (is_real(_config)) {
-            top    = _config;
-            right  = _config;
-            bottom = _config;
-            left   = _config;
-        } else if (_config[$ "h"] != undefined || _config[$ "v"] != undefined) {
+		if (_config[$ "h"] != undefined || _config[$ "v"] != undefined) {
             var _h = _config[$ "h"] ?? 0;
             var _v = _config[$ "v"] ?? 0;
             top    = _v;
