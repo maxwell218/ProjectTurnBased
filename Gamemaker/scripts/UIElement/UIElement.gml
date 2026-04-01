@@ -9,7 +9,7 @@
 // +-------------------+
 // class.UIElement
 
-function UIElement(_config) constructor {
+function UIElement(_config = {}) : Base(_config) constructor {
 	var _self = self;
 	
 	#region Config
@@ -31,9 +31,6 @@ function UIElement(_config) constructor {
 	}
 	static get_is_hovered = function() {
 		return __.is_hovered;
-	}
-	static get_content_size = function() {
-		return { width: __.width, height: __.height };
 	}
 	
 	#endregion
@@ -58,19 +55,31 @@ function UIElement(_config) constructor {
 	#endregion
 	
 	// Private
-	__ = {}
 	with (__) {
-		// Position and size
 		x = _config[$ "x"] ?? 0;
 		y = _config[$ "y"] ?? 0;
 		width  = _config[$ "width" ] ?? 0;
         height = _config[$ "height"] ?? 0;
-	
-		// Hovered state
 		is_hovered = _config[$ "is_hovered" ] ?? false;
-		
-		// Format
-		ui_format = _config[$ "ui_format"] ?? UI_MANAGER.get_ui_format();
+		static default_style = new UIStyle();
+		style = _config[$ "style"] ?? default_style;
+	}
+	
+	#endregion
+	#region Initialize
+	
+	on_initialize(function() {
+		__.style.initialize();
+	});
+	
+	#endregion
+	#region Hover
+	
+	// Public
+	static collect_hover = function(_mouse_x, _mouse_y, _hovered_stack, _context = {}) {
+		if (point_in_rectangle(_mouse_x, _mouse_y, __.x, __.y, __.x + __.width, __.y + __.height)) {
+			array_push(_hovered_stack, self);
+		}
 	}
 	
 	#endregion
@@ -82,6 +91,58 @@ function UIElement(_config) constructor {
         __.width  = _config[$ "width" ] ?? __.width;
         __.height = _config[$ "height"] ?? __.height;
     }
+	
+	#endregion
+	#region Render
+	
+	// Public
+	static _render = function() {
+		draw_sprite_stretched(spr_ui_bg, 0, __.x, __.y, __.width, __.height);
+		__render_border();
+	}
+	
+	// Private
+	with (__) {
+		static __render_border = function() {
+			//if (__.ui_format == undefined || __.ui_format.get_border_mode() == UIBorderMode.None) exit;
+			//var _border_mode = __.ui_format.get_border_mode();
+			//var _sprite = __.ui_format.get_border_sprite();
+			//var _color = __.ui_format.get_border_color();
+			//switch (_border_mode) {
+			//	case UIBorderMode.Inner:
+			//		draw_sprite_stretched_ext(
+			//			_sprite, 0,
+			//			__.x,
+			//			__.y,
+			//			__.width,
+			//			__.height,
+			//			_color, 1
+			//		);
+			//		break;
+			//	case UIBorderMode.Outer:
+			//		var _top = __.ui_format.get_border_top();
+			//		var _bottom = __.ui_format.get_border_bottom();
+			//		var _left = __.ui_format.get_border_left();
+			//		var _right = __.ui_format.get_border_right();
+			//		draw_sprite_stretched_ext(
+			//			_sprite, 0,
+			//			__.x - _left,
+			//			__.y - _top,
+			//			__.width + _left + _right,
+			//			__.height + _top + _bottom,
+			//			_color, 1
+			//		);
+			//		break;
+			//}
+		}
+	}
+	
+	// Events
+	on_render(function() {
+		// TODO Use color as fallback for missing sprite?
+		//		We should also not always draw a background if we don't have to
+		// draw_sprite_stretched(__.style.get_bg_sprite(), 0, __.x, __.y, __.width, __.height);
+	});
 	
 	#endregion
 }

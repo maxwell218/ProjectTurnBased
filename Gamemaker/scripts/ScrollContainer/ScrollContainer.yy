@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"Faction",
+  "%Name":"ScrollContainer",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"Faction",
+  "name":"ScrollContainer",
   "parent":{
-    "name":"Faction",
-    "path":"folders/Classes/Lifeform/Faction.yy",
+    "name":"Scroll",
+    "path":"folders/Classes/UI/Element/Scroll.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

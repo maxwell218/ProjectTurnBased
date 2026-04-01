@@ -38,13 +38,8 @@ get_ui_format = function() {
 // Private
 __ = {};
 with (__) {
-	ui_format = new UIFormat({
-		content_inset: 0,
-		item_spacing: 0,
-		border_mode: UIBorderMode.SharedEdge,
-	});
-    active_scene  = undefined; // single active scene
-    modal_stack   = [];        // modals layered on top, last is top-most
+    active_scene  = undefined; // Single active scene
+    modal_stack   = [];        // Modals layered on top, last is top-most
 
     hovered_stack   = [];
     hovered_element = undefined;
@@ -58,16 +53,16 @@ with (__) {
 }
 
 #endregion
-#region Step
+#region Update
 
 // Public
-step = function() {
+update = function() {
     // Reset previous frame hover state
     clear_hovered_stack();
 
     // Build hovered stack — modals block scene if any are present
-    if (instance_exists(obj_cursor)) {
-        get_hovered_stack(round(obj_cursor.gui_x), round(obj_cursor.gui_y));
+    if (instance_exists(obj_cursor) && __.active_element == undefined) {
+        get_hovered_stack(obj_cursor.gui_x, obj_cursor.gui_y);
 		var _stack_count = array_length(__.hovered_stack);
         if (_stack_count > 0) {
             __.hovered_element = __.hovered_stack[0];
@@ -77,7 +72,7 @@ step = function() {
         }
     }
 
-    // Step active element or hovered stack
+    // Process input on active element or hovered stack
     var _caller = undefined;
     if (__.active_element != undefined) {
         _caller = __.active_element;
@@ -90,12 +85,12 @@ step = function() {
         }
     }
 
-    // Step top-most modal only, or active scene if no modals
+    // Update top-most modal only, or active scene if no modals
     var _modal_count = array_length(__.modal_stack);
     if (_modal_count > 0) {
-        __.modal_stack[_modal_count - 1].step();
+        __.modal_stack[_modal_count - 1].update();
     } else if (__.active_scene != undefined) {
-        __.active_scene.step();
+        __.active_scene.update();
     }
 }
 

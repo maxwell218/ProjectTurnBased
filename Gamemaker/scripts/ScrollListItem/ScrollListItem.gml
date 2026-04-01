@@ -9,7 +9,7 @@
 // +-----------------------------------------------------------+
 // class.ScrollListItem
 
-function ScrollListItem(_config) : UIChild(_config) constructor {
+function ScrollListItem(_config = {}) : UIElement(_config) constructor {
 	var _self = self;
 	
 	#region Config
@@ -46,7 +46,7 @@ function ScrollListItem(_config) : UIChild(_config) constructor {
 		draw_rectangle(_x + 1, _y + 1, _x - 1 + __.width - 1, _y - 1 + __.height - 1, false);
 		
 		// Draw borders
-		if (_border_mode != UIBorderMode.None) __render_borders(_context, c_blue);
+		// if (_border_mode != UIBorderMode.None) __render_borders(_context, c_blue);
 		
 		draw_set_color(c_white);
 		// TODO Custom text centering

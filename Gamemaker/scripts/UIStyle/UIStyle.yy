@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"Faction",
+  "%Name":"UIStyle",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"Faction",
+  "name":"UIStyle",
   "parent":{
-    "name":"Faction",
-    "path":"folders/Classes/Lifeform/Faction.yy",
+    "name":"Base",
+    "path":"folders/Classes/UI/Base.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

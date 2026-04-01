@@ -6,7 +6,7 @@
   "name":"Event",
   "parent":{
     "name":"Event",
-    "path":"folders/Scripts/Event.yy",
+    "path":"folders/Classes/Event.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -6,7 +6,7 @@
   "name":"Injury",
   "parent":{
     "name":"Lifeform",
-    "path":"folders/Scripts/Lifeform.yy",
+    "path":"folders/Classes/Lifeform.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -1,4 +1,3 @@
-
 // +-----------------------------------------------------------+
 // |                                                           |
 // |   ______   ______   ______   ______   __       __         |
@@ -10,20 +9,7 @@
 // +-----------------------------------------------------------+
 // class.ScrollList
 
-enum ScrollAxis {
-    Vertical,
-    Horizontal
-}
-enum ScrollListPart {
-    Thumb,
-    Scrollbar
-}
-enum ScrollListSizeMode {
-    ScrollbarIncluded, // List size is fixed; items shrink by scrollbar_thickness when bar appears
-    ScrollbarExcluded, // Item area is fixed; list grows by scrollbar_thickness when bar appears
-}
-
-function ScrollList(_config) : UIParent(_config) constructor {
+function ScrollList(_config = {}) : UIParent(_config) constructor {
     var _self = self;
 
     #region Config
@@ -31,85 +17,28 @@ function ScrollList(_config) : UIParent(_config) constructor {
     // Public
     #region Getters
 
-    static get_width = function() {
-        var _w = __.width;
-
-        if (__.scroll_axis == ScrollAxis.Vertical
-        &&  __.size_mode   == ScrollListSizeMode.ScrollbarExcluded
-        &&  __.has_scrollbar) {
-            _w += __.scrollbar_thickness;
-        }
-
-        return _w;
-    }
-    static get_height = function() {
-        var _h = __.height;
-
-        if (__.scroll_axis == ScrollAxis.Horizontal
-        &&  __.size_mode   == ScrollListSizeMode.ScrollbarExcluded
-        &&  __.has_scrollbar) {
-            _h += __.scrollbar_thickness;
-        }
-
-        return _h;
-    }
+	static get_content_size = function() { return __.content_size; }
 
     #endregion
 
     // Private
     with (__) {
-        // Scroll axis
-        scroll_axis = _config[$ "scroll_axis"] ?? ScrollAxis.Vertical;
+	    scroll_axis	 = _config[$ "scroll_axis" ] ?? ScrollAxis.Vertical;
+		scroll		 = _config[$ "scroll"	   ] ?? 0;
+	    content_size = 0;
+	    surface      = -1;
 
-        // Size mode
-        size_mode = _config[$ "size_mode"] ?? ScrollListSizeMode.ScrollbarIncluded;
-
-        // Scroll behaviour
-        scroll        = 0;
-        scroll_target = 0;
-        scroll_lerp   = _config[$ "scroll_lerp" ] ?? 0.1;
-        scroll_speed  = _config[$ "scroll_speed"] ?? 20;
-
-        // Scrollbar appearance
-        scrollbar_needed    = false;
-        scrollbar_color     = _config[$ "scrollbar_color"    ] ?? COLORS.col_green_dark;
-        scrollbar_thickness = _config[$ "scrollbar_thickness"] ?? 6;
-        scrollbar_padding   = _config[$ "scrollbar_padding"  ] ?? 1;
-        scrollbar_thumb_min = _config[$ "scrollbar_thumb_min"] ?? 20;
-        scrollbar_selected  = false;
-
-        // Background
-        bg_color    = _config[$ "bg_color"   ] ?? c_dkgray;
-        line_height = _config[$ "line_height"] ?? 8;
-
-        // Content / surface
-        content_size = 0;
-        surface      = -1;
-
-        // has_scrollbar is the single source of truth for whether the bar
-        // is visible — drives rendering and hover detection in both modes
-        has_scrollbar = false;
-
-        // Visible-child culling
-        child_draw_start  = 0;
-        child_draw_amount = 0;
-
-        // Pseudo-elements for thumb / track hover tracking
-        pseudo_elements = array_create(2, undefined);
-        pseudo_elements[ScrollListPart.Thumb]     = { name: "Thumb",     owner: _self, is_hovered: false, get_is_hovered: function() { return is_hovered }, set_is_hovered: function(_is_hovered) { is_hovered = _is_hovered } };
-        pseudo_elements[ScrollListPart.Scrollbar] = { name: "Scrollbar", owner: _self, is_hovered: false, get_is_hovered: function() { return is_hovered }, set_is_hovered: function(_is_hovered) { is_hovered = _is_hovered } };
-    }
+	    // Visible-child culling
+	    child_render_start  = 0;
+	    child_render_amount = 0;
+	}
 
     #endregion
-    #region Init
-
-    // Public
-    static init = function() {
-        __.scrollbar_selected = false;
-        __.scroll_target      = 0;
-        __.scroll             = 0;
-
-        // TODO: Replace placeholder item construction with injected content
+    #region Initialize
+	
+	// Events
+	on_initialize(function() {
+		// TODO: Replace placeholder item construction with injected content
         var _count = array_length(__.children);
         array_delete(__.children, 0, _count);
 
@@ -117,7 +46,8 @@ function ScrollList(_config) : UIParent(_config) constructor {
 
         for (var _i = 0; _i < _count; _i++) {
             var _item_main  = 73;
-            var _item_cross = __.ui_format.available_cross(_is_vertical ? __.width : __.height);
+            // var _item_cross = __.ui_format.available_cross(_is_vertical ? __.width : __.height);
+			var _item_cross = _is_vertical? __.width : __.height;
 
             var _config = {
                 x:      0,
@@ -129,64 +59,13 @@ function ScrollList(_config) : UIParent(_config) constructor {
 
             array_push(__.children, new ScrollListItem(_config));
         }
-    }
+	});
 
     #endregion
-    #region Resize
+    #region Update
 
     // Public
-    static measure_size = function(_available_width, _available_height) {
-        var _view_w = (_available_width  > 0) ? _available_width  : __.width;
-        var _view_h = (_available_height > 0) ? _available_height : __.height;
-
-        var _need_scrollbar = __needs_scrollbar(_view_w, _view_h);
-
-        var _measured_w = _view_w;
-        var _measured_h = _view_h;
-
-        if (__.size_mode == ScrollListSizeMode.ScrollbarExcluded && _need_scrollbar) {
-            if (__.scroll_axis == ScrollAxis.Vertical) {
-                _measured_w += __.scrollbar_thickness;
-            } else {
-                _measured_h += __.scrollbar_thickness;
-            }
-        }
-
-        return { width: _measured_w, height: _measured_h };
-    }
-    static resize = function(_config) {
-        __.x = _config[$ "x"] ?? __.x;
-        __.y = _config[$ "y"] ?? __.y;
-
-        var _outer_w = _config[$ "width" ] ?? get_width();
-        var _outer_h = _config[$ "height"] ?? get_height();
-
-        var _content_w = _outer_w;
-        var _content_h = _outer_h;
-
-        if (__.size_mode == ScrollListSizeMode.ScrollbarExcluded) {
-            if (__.scroll_axis == ScrollAxis.Vertical) {
-                if (__needs_scrollbar(_outer_w, _outer_h)) {
-                    _content_w -= __.scrollbar_thickness;
-                }
-            } else {
-                if (__needs_scrollbar(_outer_w, _outer_h)) {
-                    _content_h -= __.scrollbar_thickness;
-                }
-            }
-        }
-
-        __.width  = _content_w;
-        __.height = _content_h;
-
-        rebuild_content();
-    }
-
-    #endregion
-    #region Step
-
-    // Public
-    static step = function() {
+    static _update = function() {
         var _is_vertical  = (__.scroll_axis == ScrollAxis.Vertical);
         var _view_size    = _is_vertical ? __.height : __.width;
         var _content_size = __.content_size;
@@ -223,7 +102,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
             if (_item_end >= _top_view) break;
             _i++;
         }
-        __.child_draw_start = _i;
+        __.child_render_start = _i;
 
         while (_i < _count) {
             var _item       = __.children[_i];
@@ -231,31 +110,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
             if (_item_start > _bottom_view) break;
             _i++;
         }
-        __.child_draw_amount = _i - __.child_draw_start;
-    }
-
-    #endregion
-    #region Input
-
-    // Public
-    static on_primary_action_pressed = function() {
-        if (__.pseudo_elements[ScrollListPart.Thumb].is_hovered
-        ||  __.pseudo_elements[ScrollListPart.Scrollbar].is_hovered) {
-            __.scrollbar_selected = true;
-            event_manager_publish(Event.CaptureActiveElement, self);
-        }
-    }
-    static on_primary_action_released = function() {
-        if (__.scrollbar_selected) {
-            __.scrollbar_selected = false;
-            event_manager_publish(Event.UnsetActiveElement);
-        }
-    }
-    static on_scroll = function() {
-        var _mw = mouse_wheel_up() - mouse_wheel_down();
-        if (!__.scrollbar_selected && __.is_hovered) {
-            __.scroll_target -= _mw * __.scroll_speed;
-        }
+        __.child_render_amount = _i - __.child_render_start;
     }
 
     #endregion
@@ -265,35 +120,35 @@ function ScrollList(_config) : UIParent(_config) constructor {
     static rebuild_content = function() {
         var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
         var _count       = array_length(__.children);
-        var _layout      = __.ui_format;
+        var _format      = __.ui_format;
 
         // Cross-axis usable size (inset subtracted symmetrically on both sides)
-        var _cross_size = _layout.available_cross(_is_vertical ? __.width : __.height);
+        var _cross_size = _format.available_cross(_is_vertical ? __.width : __.height);
 
         // --- Pass 1: place all items using layout helper ---
         // cursor begins at content_inset; gap_before() adds item_spacing only
         // between items, never before the first or after the last.
-        var _cursor = _layout.first_item_offset();
+        var _cursor = _format.first_item_offset();
 
         for (var _i = 0; _i < _count; _i++) {
             var _item = __.children[_i];
-            _cursor  += _layout.gap_before(_i);   // 0 for item 0; item_spacing for _i > 0
+            _cursor  += _format.gap_before(_i);   // 0 for item 0; item_spacing for _i > 0
 
             if (_is_vertical) {
-                _item.set_x(_layout.content_inset);
+                _item.set_x(_format.get_content_inset());
                 _item.set_y(_cursor);
                 _item.set_width(_cross_size);
                 _cursor += _item.get_height();
             } else {
                 _item.set_x(_cursor);
-                _item.set_y(_layout.content_inset);
+                _item.set_y(_format.get_content_inset());
                 _item.set_height(_cross_size);
                 _cursor += _item.get_width();
             }
         }
 
         // Trailing inset closes the content region
-        _cursor += _layout.content_inset;
+        _cursor += _format.get_content_inset();
 
 		// Compare content size to view size, determine if scrollbar is needed
         var _view_size      = _is_vertical ? __.height : __.width;
@@ -322,18 +177,20 @@ function ScrollList(_config) : UIParent(_config) constructor {
     #region Render
 
     // Public
-    static render = function() {
+    static _render = function() {
 		#region Surface / Background
 		
+		__render_border();
+		
         if (!surface_exists(__.surface)) {
-            __.surface = surface_create(get_width(), get_height());
+            __.surface = surface_create(__.width, __.height);
         }
 
         surface_set_target(__.surface);
         draw_clear_alpha(c_black, 0);
 
         draw_set_color(__.bg_color);
-        draw_rectangle(0, 0, __.width, __.height, false);
+        draw_sprite_stretched(spr_ui_bg, 0, 0, 0, __.width, __.height);
 		
 		#endregion
 		#region Children
@@ -342,7 +199,7 @@ function ScrollList(_config) : UIParent(_config) constructor {
             scroll_axis: __.scroll_axis,
             scroll_x:    (__.scroll_axis == ScrollAxis.Horizontal) ? __.scroll : 0,
             scroll_y:    (__.scroll_axis == ScrollAxis.Vertical)   ? __.scroll : 0,
-			border_mode: __.ui_format.border_mode,
+			border_mode: __.ui_format.get_border_mode(),
         };
         var _hovered_child = undefined;
         for (var _i = __.child_draw_start; _i < __.child_draw_start + __.child_draw_amount; _i++) {
@@ -354,31 +211,30 @@ function ScrollList(_config) : UIParent(_config) constructor {
         }
 		
 		// Render hover
-        if (_context.border_mode != UIBorderMode.None && _hovered_child != undefined && UI_MANAGER.get_active_element() == undefined) {
-            _hovered_child.render_hover(_context);
-        }
+        //if (_context.border_mode != UIBorderMode.None && _hovered_child != undefined && UI_MANAGER.get_active_element() == undefined) {
+        //    _hovered_child.render_hover(_context);
+        //}
 		
 		#endregion
-		#region Scrollbar
+		#region Reset / Draw
 		
-        if (__.has_scrollbar) {
-            __render_scrollbar();
-            __render_thumb();
-        }
-		
-		#endregion
-		
-		// TODO Implement better border system
 		draw_set_color(c_white);
-		
 		
 		// Reset and draw
         surface_reset_target();
         draw_surface(__.surface, __.x, __.y);
 		
-		__render_borders();
+		#endregion
+		#region Scrollbar
+		
+		if (__.has_scrollbar) {
+            __render_scrollbar();
+			__render_thumb();
+        }
+		
+		#endregion
     }
-    static render_gui = function() {
+    static _render_gui = function() {
         if (global.debug) {
             draw_set_halign(fa_left);
             draw_set_valign(fa_top);
@@ -393,74 +249,81 @@ function ScrollList(_config) : UIParent(_config) constructor {
             if (__.scroll_axis != ScrollAxis.Vertical) return 0;
 
             switch (__.size_mode) {
-                case ScrollListSizeMode.ScrollbarIncluded: return __.width - __.scrollbar_thickness;
-                case ScrollListSizeMode.ScrollbarExcluded: return __.width;
+                case ScrollListSizeMode.ScrollbarIncluded: return __.x + __.width - __.scrollbar_thickness;
+                case ScrollListSizeMode.ScrollbarExcluded: return __.x + __.width;
             }
-
-            return __.width - __.scrollbar_thickness;
         }
         static __get_scrollbar_y = function() {
             if (__.scroll_axis != ScrollAxis.Horizontal) return 0;
 
             switch (__.size_mode) {
-                case ScrollListSizeMode.ScrollbarIncluded: return __.height - __.scrollbar_thickness;
-                case ScrollListSizeMode.ScrollbarExcluded: return __.height;
+                case ScrollListSizeMode.ScrollbarIncluded: return __.y + __.height - __.scrollbar_thickness;
+                case ScrollListSizeMode.ScrollbarExcluded: return __.y + __.height;
             }
-
-            return __.height - __.scrollbar_thickness;
         }
         static __render_scrollbar = function() {
-            var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
-            draw_set_color(c_olive);
-
+            var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical); 
+			var _border_sprite = __.ui_format.get_border_sprite();
+			draw_set_color(c_olive);
             if (_is_vertical) {
                 var _sx = __get_scrollbar_x();
-                draw_rectangle(_sx, 0, _sx + __.scrollbar_thickness, __.height, false);
+				draw_sprite_stretched(_border_sprite, 0, _sx, __.y, __.scrollbar_thickness, __.height);
             } else {
                 var _sy = __get_scrollbar_y();
-                draw_rectangle(0, _sy, __.width, _sy + __.scrollbar_thickness, false);
+				draw_sprite_stretched(_border_sprite, 0, __.x, _sy, __.width, __.scrollbar_thickness);
             }
+			draw_set_color(c_white);
         }
         static __render_thumb = function() {
-            var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
-            var _view_size   = _is_vertical ? __.height : __.width;
-            var _thumb_size  = __get_thumb_size();
-            var _thumb_pos   = __.scroll / (__.content_size - _view_size) * (_view_size - _thumb_size);
-            var _sb_padding  = __.scrollbar_padding;
+		    var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
 
-            _thumb_pos = clamp(_thumb_pos, _sb_padding, _view_size - _thumb_size - _sb_padding - 1);
-			
-			var _condition = 
-			(UI_MANAGER.get_active_element() == self || UI_MANAGER.get_active_element() == undefined) 
-			&& (__.scrollbar_selected || __.pseudo_elements[ScrollListPart.Thumb].is_hovered);
-			
-            var _thumb_color = (_condition) ? c_white : __.scrollbar_color;
-            draw_set_color(_thumb_color);
+		    var _view_size  = _is_vertical ? __.height : __.width;
+		    var _track_start = _is_vertical ? __.y : __.x;
+		    var _track_end   = _track_start + _view_size;
 
-            if (_is_vertical) {
-                var _sx = __get_scrollbar_x();
-                draw_rectangle(
-                    _sx + _sb_padding,
-                    _thumb_pos,
-                    _sx + __.scrollbar_thickness - _sb_padding - 1,
-                    _thumb_pos + _thumb_size,
-                    false
-                );
-            } else {
-                var _sy = __get_scrollbar_y();
-                draw_rectangle(
-                    _thumb_pos,
-                    _sy + _sb_padding,
-                    _thumb_pos + _thumb_size,
-                    _sy + __.scrollbar_thickness - _sb_padding - 1,
-                    false
-                );
-            }
-        }
-		static __render_borders = function() {
-			draw_sprite_stretched(spr_ui_borders, 0, __.x, __.y, get_width(), get_height());
+		    var _thumb_size = __get_thumb_size();
+		    var _sb_padding = __.scrollbar_padding;
+
+		    var _scroll_range = max(__.content_size - _view_size, 1);
+		    var _track_range  = max(_view_size - _thumb_size - (_sb_padding * 2), 0);
+
+		    var _thumb_pos = _track_start + _sb_padding + (__.scroll / _scroll_range) * _track_range;
+		    _thumb_pos = clamp(_thumb_pos, _track_start + _sb_padding, _track_end - _thumb_size - _sb_padding);
+
+		    var _thumb_color = (__.scrollbar_selected || __.pseudo_elements[ScrollListPart.Thumb].is_hovered)
+		        ? c_white
+		        : __.scrollbar_color;
+
+		    draw_set_color(_thumb_color);
+
+		    if (_is_vertical) {
+		        var _sx = __get_scrollbar_x();
+		        draw_rectangle(
+		            _sx + _sb_padding,
+		            _thumb_pos,
+		            _sx + __.scrollbar_thickness - _sb_padding - 1,
+		            _thumb_pos + _thumb_size - 1,
+		            false
+		        );
+		    } else {
+		        var _sy = __get_scrollbar_y();
+		        draw_rectangle(
+		            _thumb_pos,
+		            _sy + _sb_padding,
+		            _thumb_pos + _thumb_size - 1,
+		            _sy + __.scrollbar_thickness - _sb_padding - 1,
+		            false
+		        );
+		    }
+
+		    draw_set_color(c_white);
 		}
     }
+	
+	// Events
+	on_render(function() {
+		
+	});
 
     #endregion
     #region Hover
@@ -495,10 +358,10 @@ function ScrollList(_config) : UIParent(_config) constructor {
             if (_is_vertical) {
                 var _sx = __get_scrollbar_x();
                 return (_mx >= _sx && _mx <= _sx + __.scrollbar_thickness
-                    &&  _my >= 0   && _my <= __.height);
+                    &&  _my >= __.y   && _my <= __.y + __.height);
             } else {
                 var _sy = __get_scrollbar_y();
-                return (_mx >= 0   && _mx <= __.width
+                return (_mx >= __.x && _mx <= __.x + __.width
                     &&  _my >= _sy && _my <= _sy + __.scrollbar_thickness);
             }
         }
@@ -531,47 +394,12 @@ function ScrollList(_config) : UIParent(_config) constructor {
     }
 
     #endregion
-    #region Helpers
-
-    // Private
-    with (__) {
-        static __get_thumb_size = function() {
-            var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
-            var _view_size   = _is_vertical ? __.height : __.width;
-            var _scroll_area = _view_size - __.scrollbar_padding * 2;
-            var _view_ratio  = _view_size / __.content_size;
-
-            return max(round(_scroll_area * _view_ratio), __.scrollbar_thumb_min);
-        }
-        static __needs_scrollbar = function(_view_w, _view_h) {
-            var _is_vertical = (__.scroll_axis == ScrollAxis.Vertical);
-            var _view_size   = _is_vertical ? _view_h : _view_w;
-            var _count       = array_length(__.children);
-            var _layout      = __.ui_format;
-
-            var _cursor = _layout.first_item_offset();
-
-            for (var _i = 0; _i < _count; _i++) {
-                var _item = __.children[_i];
-                _cursor  += _layout.gap_before(_i);
-                _cursor  += _is_vertical ? _item.get_height() : _item.get_width();
-
-                // Early exit, scrollbar definitely needed
-                if (_cursor + _layout.content_inset > _view_size) return true;
-            }
-
-            _cursor += _layout.content_inset; // Trailing inset
-            return (_cursor > _view_size);
-        }
-    }
-
-    #endregion
     #region Cleanup
 
-    // Public
-    static cleanup = function() {
-        surface_free(__.surface);
-    }
+    // Events
+	on_cleanup(function() {
+		surface_free(__.surface);
+	});
 
     #endregion
 }

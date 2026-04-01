@@ -6,7 +6,7 @@
   "name":"IGlobalItemData",
   "parent":{
     "name":"Inventory",
-    "path":"folders/Scripts/Inventory.yy",
+    "path":"folders/Classes/Inventory.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -10,11 +10,19 @@
 // class.LayoutNode
 
 function LayoutNode(_config) constructor {
+	// TODO Nomenclature
 	
 	// Public
 	#region Getters
 	
 	static get_element         = function() { return __.element;         }
+	static get_element_format  = function() {
+		if (variable_struct_exists(__.element, "get_ui_format")) {
+			return __.element.get_ui_format();
+		}
+		
+		return undefined;
+	}
     static get_size_x          = function() { return __.size_x;          }
     static get_size_y          = function() { return __.size_y;          }
     static get_margin          = function() { return __.margin;          }
@@ -22,6 +30,18 @@ function LayoutNode(_config) constructor {
     static get_resolved_y      = function() { return __.resolved_y;      }
     static get_resolved_width  = function() { return __.resolved_width;  }
     static get_resolved_height = function() { return __.resolved_height; }
+	static get_visual_leading = function(_is_h) {
+		if (variable_struct_exists(__.element, "get_visual_leading")) {
+	        return __.element.get_visual_leading(_is_h);
+	    }
+	    return 0;
+	}
+	static get_visual_trailing = function(_is_h) {
+	    if (variable_struct_exists(__.element, "get_visual_trailing")) {
+	        return __.element.get_visual_trailing(_is_h);
+	    }
+	    return 0;
+	}
 	
 	#endregion
 	

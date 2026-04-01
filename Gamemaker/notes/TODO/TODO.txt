@@ -1,0 +1,34 @@
+// +----------------------------------------+
+// |                                        |
+// |   ______  ______   _____    ______     |
+// |  /\__  _\/\  __ \ /\  __-. /\  __ \    |
+// |  \/_/\ \/\ \ \/\ \\ \ \/\ \\ \ \/\ \   |
+// |     \ \_\ \ \_____\\ \____- \ \_____\  |
+// |      \/_/  \/_____/ \/____/  \/_____/  |
+// |                                        |
+// +----------------------------------------+
+// Prototype (version 0.0.0)
+
+--- UI CLASSES
+	--- [-] Finish writing ScrollContainer, ScrollList, ScrollBar logic/refactor
+	--- [-] Find solution for borders on flex panel nodes (shared borders)
+		--- Maybe border masking? Parent gives mask to children, node gives mask to their element
+		--- For the unit list, figure out if there's a way to have the selected item's border always be visible
+			even when the item is only partially in view
+	--- [-] Define UIStyle with more styles to recreate our mockups
+	--- [-] UIElements should only care about relevant styles (box, scrollbar, etc.)
+	
+--- WORLD
+	--- ...
+
+--- LIFEFORMS
+	--- ...
+
+--- COMBAT
+	--- [-] IDEA: Hex tiles are divided with 7 cells to have more lifeforms standing on the same hex tile
+			--- Each cell could offer cover, making that cell impassable
+			--- Dropped items are stored in the current cell, not the full tile (collapses after combat)
+	--- [-] IDEA: Can only flee from combat if hidden
+	--- [-] Combat animations?
+		--- IDEA #1: Use sprite stacking
+		--- IDEA #2: Use a mix of UV maps and PixelOver (2d bone animations)

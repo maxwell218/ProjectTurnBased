@@ -27,37 +27,40 @@ function SceneInventory(_config) : Scene(_config) constructor {
 			ui_format: new UIFormat({
 				content_inset: 0,
 				item_spacing: -1,
-				border_mode: UIBorderMode.SharedEdge,
+				border_mode: UIBorderMode.Inner,
 			}),
             scroll_axis: ScrollAxis.Horizontal,
             size_mode:   ScrollListSizeMode.ScrollbarExcluded,
         });
+		// __.elements.unit_list = new UIPlaceholder({});
         __.elements.equipment_left   = new UIPlaceholder({});
-        __.elements.containers_left  = new ScrollList({
-			children: _list_2,
-			ui_format: new UIFormat({
-				content_inset: 11,
-				item_spacing: 11,
-				border_mode: UIBorderMode.SharedEdge,
-			}),
-			scroll_axis: ScrollAxis.Vertical,
-            size_mode:   ScrollListSizeMode.ScrollbarIncluded,
-		});
+        //__.elements.containers_left  = new ScrollList({
+		//	children: _list_2,
+		//	ui_format: new UIFormat({
+		//		content_inset: 11,
+		//		item_spacing: 11,
+		//		border_mode: UIBorderMode.SharedEdge,
+		//	}),
+		//	scroll_axis: ScrollAxis.Vertical,
+        //    size_mode:   ScrollListSizeMode.ScrollbarIncluded,
+		//});
+		__.elements.containers_left = new UIPlaceholder({});
         __.elements.equipment_right  = new UIPlaceholder({});
-        __.elements.containers_right = new ScrollList({
-			children: _list_3,
-			ui_format: new UIFormat({
-				content_inset: 11,
-				item_spacing: 11,
-				border_mode: UIBorderMode.SharedEdge,
-			}),
-			scroll_axis: ScrollAxis.Vertical,
-            size_mode:   ScrollListSizeMode.ScrollbarIncluded,
-		});
+        //__.elements.containers_right = new ScrollList({
+		//	children: _list_3,
+		//	ui_format: new UIFormat({
+		//		content_inset: 11,
+		//		item_spacing: 11,
+		//		border_mode: UIBorderMode.SharedEdge,
+		//	}),
+		//	scroll_axis: ScrollAxis.Vertical,
+        //    size_mode:   ScrollListSizeMode.ScrollbarIncluded,
+		//});
+		__.elements.containers_right = new UIPlaceholder({});
         __.elements.navbar           = new UIPlaceholder({});
 
         // --- Inner row ---
-        var _row = new LayoutContainer({ direction: LayoutDirection.Horizontal });
+        var _row = new LayoutContainer({ direction: LayoutDirection.Horizontal, margin: new LayoutMargin({ top: -1 }) });
         _row
         .add_node(new LayoutNode({
                 element: __.elements.equipment_left,
@@ -109,8 +112,8 @@ function SceneInventory(_config) : Scene(_config) constructor {
             }));
 			
 		__.elements.unit_list.init();
-		__.elements.containers_left.init();
-		__.elements.containers_right.init();
+		//__.elements.containers_left.init();
+		//__.elements.containers_right.init();
         __.layout.solve();
     }
 	

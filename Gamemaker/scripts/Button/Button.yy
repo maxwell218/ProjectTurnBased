@@ -6,7 +6,7 @@
   "name":"Button",
   "parent":{
     "name":"Element",
-    "path":"folders/Scripts/UI/Element.yy",
+    "path":"folders/Classes/UI/Element.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

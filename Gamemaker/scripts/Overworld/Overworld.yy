@@ -6,7 +6,7 @@
   "name":"Overworld",
   "parent":{
     "name":"World",
-    "path":"folders/Scripts/World.yy",
+    "path":"folders/Classes/World.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

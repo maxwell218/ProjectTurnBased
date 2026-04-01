@@ -9,4 +9,4 @@
 // +-------------------+
 // obj_ui_manager.step
 
-step();
+update();

@@ -157,38 +157,33 @@ get_scale = function() {
 // Private
 with (__) {
 	calculate_scale = method(_self, function() {
-	    var _h_scale = floor(__.window_width  / __.base_width);
-	    var _v_scale = floor(__.window_height / __.base_height);
+	    var _win_w = __.window_width;
+	    var _win_h = __.window_height;
+
+	    // integer scale based on your minimum/base view
+	    var _h_scale = _win_w div __.base_width;
+	    var _v_scale = _win_h div __.base_height;
 	    __.scale = max(min(_h_scale, _v_scale), 1);
-		// TODO Proper scale clamping
-		// __.scale = clamp(__.scale, 2, 3);
 
-	    // Expand to GUI dimensions
-	    var _expanded_w = floor(__.window_width  / __.scale);
-	    var _expanded_h = floor(__.window_height / __.scale);
+	    // grow the camera view to show more game
+	    var _view_w = _win_w div __.scale;
+	    var _view_h = _win_h div __.scale;
 
-	    // Optional: keep these even if your game logic really needs it
-	    _expanded_w -= (_expanded_w mod 2);
-	    _expanded_h -= (_expanded_h mod 2);
+	    // keep the camera snapped to whole pixels
+	    camera_set_view_size(view_camera[0], _view_w, _view_h);
 
-	    // Port size in window pixels
-	    var _port_w = _expanded_w * __.scale;
-	    var _port_h = _expanded_h * __.scale;
+	    // fill as much of the window as integer scaling allows
+	    var _port_w = _view_w * __.scale;
+	    var _port_h = _view_h * __.scale;
 
-	    // Actual remainder
-	    var _remainder_x = __.window_width  - _port_w;
-	    var _remainder_y = __.window_height - _port_h;
-
-	    // Center normally
-	    var _port_x = _remainder_x div 2;
-	    var _port_y = _remainder_y div 2;
+	    var _port_x = (_win_w - _port_w) div 2;
+	    var _port_y = (_win_h - _port_h) div 2;
 
 	    __.offset_x = _port_x;
 	    __.offset_y = _port_y;
 
-	    surface_resize(application_surface, _expanded_w, _expanded_h);
-	    display_set_gui_size(_expanded_w, _expanded_h);
-	    camera_set_view_size(view_camera[0], _expanded_w, _expanded_h);
+	    surface_resize(application_surface, _view_w, _view_h);
+	    display_set_gui_size(_view_w, _view_h);
 
 	    view_set_wport(0, _port_w);
 	    view_set_hport(0, _port_h);
@@ -196,8 +191,8 @@ with (__) {
 	    view_set_yport(0, _port_y);
 
 	    event_manager_publish(Event.ViewResized, {
-	        width:  _expanded_w,
-	        height: _expanded_h,
+	        width:  _view_w,
+	        height: _view_h,
 	    });
 	});
 }

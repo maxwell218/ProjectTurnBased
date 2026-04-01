@@ -1,0 +1,11 @@
+{
+  "$GMNotes":"v1",
+  "%Name":"TODO",
+  "name":"TODO",
+  "parent":{
+    "name":"ProjectTurnBased",
+    "path":"ProjectTurnBased.yyp",
+  },
+  "resourceType":"GMNotes",
+  "resourceVersion":"2.0",
+}

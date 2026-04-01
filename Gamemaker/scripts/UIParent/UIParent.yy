@@ -6,7 +6,7 @@
   "name":"UIParent",
   "parent":{
     "name":"Base",
-    "path":"folders/Scripts/UI/Base.yy",
+    "path":"folders/Classes/UI/Base.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

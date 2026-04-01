@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"ScrollList",
   "parent":{
-    "name":"ScrollList",
-    "path":"folders/Scripts/UI/Element/ScrollList.yy",
+    "name":"Scroll",
+    "path":"folders/Classes/UI/Element/Scroll.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

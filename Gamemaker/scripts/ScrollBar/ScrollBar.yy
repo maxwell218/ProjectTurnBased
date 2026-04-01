@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"UIChild",
+  "%Name":"ScrollBar",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"UIChild",
+  "name":"ScrollBar",
   "parent":{
-    "name":"Base",
-    "path":"folders/Scripts/UI/Base.yy",
+    "name":"Scroll",
+    "path":"folders/Classes/UI/Element/Scroll.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

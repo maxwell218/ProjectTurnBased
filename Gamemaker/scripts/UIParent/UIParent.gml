@@ -9,7 +9,7 @@
 // +-------------------+
 // class.UIParent
 
-function UIParent(_config) : UIElement(_config) constructor {
+function UIParent(_config = {}) : UIElement(_config) constructor {
 	var _self = self;
 	
 	#region Config

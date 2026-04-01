@@ -6,7 +6,7 @@
   "name":"HumanStats",
   "parent":{
     "name":"Human",
-    "path":"folders/Scripts/Lifeform/Human.yy",
+    "path":"folders/Classes/Lifeform/Human.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

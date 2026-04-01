@@ -6,7 +6,7 @@
   "name":"InputHandling",
   "parent":{
     "name":"Input",
-    "path":"folders/Scripts/Input.yy",
+    "path":"folders/Classes/Input.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

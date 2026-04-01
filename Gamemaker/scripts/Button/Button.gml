@@ -1,4 +1,4 @@
-function Button(_x, _y, _width, _height, _action) : UIChild(_x, _y, _width, _height) constructor {
+function Button(_x, _y, _width, _height, _action) : UIElement(_x, _y, _width, _height) constructor {
 	
 	#region Methods
 	
